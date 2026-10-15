@@ -1,8 +1,20 @@
 [project]
 name = "qoradfxm"
 version = "0.1.0"
-description = "QoraDFXM detector-image analysis engine with a CLI and a PySide6 GUI"
+description = "Dark-field X-ray microscopy detector-image analysis engine with a CLI and a PySide6 GUI"
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE*"]
+keywords = ["dark-field x-ray microscopy", "dfxm", "hdf5", "image analysis", "synchrotron", "ellipse fitting"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Image Processing",
+]
 authors = [{ name = "Isaac Yong", email = "isaacyong@naver.com" }]
 requires-python = ">=3.14"
 # Headless base: the Core engine + the CLI. No Qt here on purpose — a batch /
@@ -27,13 +39,17 @@ cuda = ["cupy-cuda13x[ctk]>=14.1.1"]
 [project.urls]
 Homepage = "https://github.com/NaNIsaac/QoraDFXM"
 Repository = "https://github.com/NaNIsaac/QoraDFXM"
+Issues = "https://github.com/NaNIsaac/QoraDFXM/issues"
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling>=1.27"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/qoradfxm"]
+
+[tool.hatch.build.targets.sdist]
+exclude = ["notebook/", ".github/", ".claude/", ".codigest/", "uv.lock"]
 
 [project.scripts]
 qoradfxm = "qoradfxm.cli:main"

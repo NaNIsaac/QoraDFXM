@@ -7,7 +7,7 @@ two front-ends — a headless CLI and a PySide6 desktop app.
 core/  pure engine (no Qt)  ←  cli/  headless front-end  ←  gui/  desktop app
 ```
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+See [docs/ARCHITECTURE.md](https://github.com/NaNIsaac/QoraDFXM/blob/main/docs/ARCHITECTURE.md).
 
 ## Install
 
