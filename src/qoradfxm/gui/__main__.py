@@ -27,7 +27,9 @@ def main(files=None) -> int:
     try:
         import ctypes
 
-        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("qoradfxm.opticalc")
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(
+            "qoradfxm.opticalc"
+        )
     except AttributeError, OSError:
         pass  # not Windows, or the shell refused — cosmetic only
 

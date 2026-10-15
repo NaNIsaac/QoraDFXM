@@ -102,7 +102,9 @@ class QoraDFXMDataset:
     # -------------------------------------------------- geometric (warp)
     # These change the image SHAPE, so anything picked on the old grid (fit
     # points, ROIs) no longer lines up — apply them before fitting.
-    def scale(self, sx: float, sy: float | None = None, interp="auto") -> QoraDFXMDataset:
+    def scale(
+        self, sx: float, sy: float | None = None, interp="auto"
+    ) -> QoraDFXMDataset:
         """Resize by factors; ``sx != sy`` changes the aspect ratio."""
         return self._add_op(
             "scale", sx=float(sx), sy=float(sx if sy is None else sy), interp=interp

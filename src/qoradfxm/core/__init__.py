@@ -15,10 +15,10 @@ from .results import MASTER_COLUMNS, FitResult, ResultsFrame
 __all__ = [
     "MASTER_COLUMNS",
     "OP_LABELS",
-    "QoraDFXMDataset",
     "FitResult",
     "History",
     "Operation",
+    "QoraDFXMDataset",
     "ResultsFrame",
     "RingProfile",
     "fitting",

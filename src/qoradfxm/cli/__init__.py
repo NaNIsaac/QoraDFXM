@@ -24,7 +24,13 @@ import json
 import sys
 from pathlib import Path
 
-from ..core import MASTER_COLUMNS, QoraDFXMDataset, FitResult, ResultsFrame, ring_profile
+from ..core import (
+    MASTER_COLUMNS,
+    FitResult,
+    QoraDFXMDataset,
+    ResultsFrame,
+    ring_profile,
+)
 from ..core import io as core_io
 from .spec import OP_ARG_HELP, SpecError, parse_ops
 
@@ -225,7 +231,9 @@ def _version() -> str:
 
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="qoradfxm", description="QoraDFXM batch analysis")
-    p.add_argument("-V", "--version", action="version", version=f"qoradfxm {_version()}")
+    p.add_argument(
+        "-V", "--version", action="version", version=f"qoradfxm {_version()}"
+    )
     sub = p.add_subparsers(dest="cmd", required=True)
 
     f = sub.add_parser("fit", help="preprocess (+ optionally ellipse-fit) a shot")
