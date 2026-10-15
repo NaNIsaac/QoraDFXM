@@ -11,11 +11,18 @@ See [docs/ARCHITECTURE.md](https://github.com/NaNIsaac/QoraDFXM/blob/main/docs/A
 
 ## Install
 
+Requires Python 3.14. Not on PyPI yet; install from GitHub or a clone:
+
 ```bash
-uv sync                     # dev: engine + CLI + GUI (the dev group pulls qoradfxm[gui])
-uv sync --no-dev            # headless: engine + CLI only, no Qt
-pip install 'qoradfxm[gui]'     # desktop app
-pip install qoradfxm            # batch / beamline machine — no Qt
+pip install "qoradfxm[gui] @ git+https://github.com/NaNIsaac/QoraDFXM"   # desktop app
+pip install "git+https://github.com/NaNIsaac/QoraDFXM"                  # headless: engine + CLI, no Qt
+```
+
+From a clone with [uv](https://docs.astral.sh/uv/):
+
+```bash
+uv sync                     # engine + CLI + GUI (the dev group pulls qoradfxm[gui])
+uv sync --no-dev            # engine + CLI only, no Qt
 ```
 
 `cupy` (GPU) is an opt-in extra: `uv sync --extra cuda`.
@@ -75,4 +82,13 @@ row = ds.to_record()   # one Master-table row
 uv run task gui     # launch the app
 uv run task cli     # qoradfxm CLI
 uv run task lint    # ruff check + format --check
+uv run pytest       # GUI tests run on Qt's offscreen platform
 ```
+
+## Citation
+
+See [CITATION.cff](CITATION.cff).
+
+## License
+
+MIT, see [LICENSE](LICENSE).
