@@ -7,8 +7,10 @@ authors:
     given-names: Isaac
     email: isaacyong@naver.com
     affiliation: "Sogang University"
+license: MIT
 repository-code: "https://github.com/NaNIsaac/QoraDFXM"
 abstract: "Dark-field X-ray microscopy (DFXM) detector-image analysis: a pure Python engine with a headless CLI and a PySide6 desktop app."
+license: MIT
 keywords:
   - "dark-field X-ray microscopy"
   - "DFXM"
