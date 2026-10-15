@@ -62,6 +62,7 @@ HDF5; anything else is a file path. Geometric ops change the image shape — put
 them before a fit, since points picked earlier no longer line up.
 Without `--points`, `fit` only reports the processed image stats.
 
+The desktop app also has its own entry point, `qoradfxm-gui [files...]`.
 Module form (no install step): `python -m qoradfxm.cli ...`, `python -m qoradfxm.gui`.
 
 ## Python
