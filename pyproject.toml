@@ -3,6 +3,7 @@ name = "qoradfxm"
 version = "0.1.0"
 description = "QoraDFXM detector-image analysis engine with a CLI and a PySide6 GUI"
 readme = "README.md"
+authors = [{ name = "Isaac Yong", email = "isaacyong@naver.com" }]
 requires-python = ">=3.14"
 # Headless base: the Core engine + the CLI. No Qt here on purpose — a batch /
 # beamline machine installs only this. The desktop app is the `gui` extra.
@@ -22,6 +23,10 @@ gui = [
     "qtawesome>=1.4.2",
 ]
 cuda = ["cupy-cuda13x[ctk]>=14.1.1"]
+
+[project.urls]
+Homepage = "https://github.com/NaNIsaac/QoraDFXM"
+Repository = "https://github.com/NaNIsaac/QoraDFXM"
 
 [build-system]
 requires = ["hatchling"]

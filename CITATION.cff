@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "QoraDFXM: QoraDFXM detector-image analysis engine with a CLI and a PySide6 GUI"
+authors:
+  - family-names: Yong
+    given-names: Isaac
+    email: isaacyong@naver.com
+    affiliation: "Sogang University"
+repository-code: "https://github.com/NaNIsaac/QoraDFXM"
+abstract: "Dark-field X-ray microscopy (DFXM) detector-image analysis: a pure Python engine with a headless CLI and a PySide6 desktop app."
+keywords:
+  - "dark-field X-ray microscopy"
+  - "DFXM"
+  - "image analysis"
+  - "X-ray"
+  - "HDF5"
+  - "PySide6"
+version: "0.1.0"
+date-released: "2026-08-29"
