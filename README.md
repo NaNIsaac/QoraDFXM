@@ -18,6 +18,11 @@ shot in one table (CSV). It can also sweep the fitted ellipse outward and report
 the mean brightness along it. The same steps run from the command line for batch
 work or in a desktop app for picking points by hand.
 
+![The desktop app on a synthetic ring image: fitted ellipse and the ring profile I(k)](docs/screenshot.png)
+
+*Synthetic ring image (400×300, ring at 1.3× the fitted ellipse). Eight points on
+the inner ellipse are fitted; the ring profile tab peaks at k = 1.3.*
+
 ```bash
 qoradfxm fit shot.h5 --dataset /run/scan00001/det/eh1hama_img/data     --op sub_bg:/dark --op log --points pts.json --out results.csv
 ```
@@ -78,6 +83,24 @@ HDF5; anything else is a file path. Geometric ops change the image shape — put
 them after `sub_bg`/`divide` (a reference of another shape is an error, not a
 skip) and before a fit, since points picked earlier no longer line up.
 Without `--points`, `fit` only reports the processed image stats.
+
+Example on the same synthetic ring image, with eight points on the inner
+ellipse (centre 200, 150; semi-axes 120, 60; 30°):
+
+```console
+$ qoradfxm fit ring.tif --points pts.json --out results.csv
+wrote results.csv (1 row)
+$ cat results.csv
+shot_id,status,center_x,center_y,major_axis,minor_axis,angle_deg,fit_error,points_json,bg_applied,log_scale
+ring,OK,200.0,150.0,240.00157168475886,120.00078610129981,29.998661369599404,0.002452465539931566,"[[303.92, 210.0], [252.27, 229.17], [170.0, 201.96], [105.3, 144.32], [96.08, 90.0], [147.73, 70.83], [230.0, 98.04], [294.7, 155.68]]",False,False
+$ qoradfxm ring ring.tif --points pts.json --k 0.5:2.0:0.005 --width 3 --out ring.csv
+shot_id  : ring
+ellipse  : a=120.00 b=60.00 px, angle=30.00°
+k range  : 0.5 … 2  (301 steps)
+peak     : k=1.3000 (a·k=156.00 px)  I=100.833  FWHM=0.1230 k
+note     : some rings leave the image (min valid fraction 0.56)
+wrote ring.csv (301 rows)
+```
 
 The desktop app also has its own entry point, `qoradfxm-gui [files...]`.
 Module form (no install step): `python -m qoradfxm.cli ...`, `python -m qoradfxm.gui`.
