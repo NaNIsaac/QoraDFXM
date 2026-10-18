@@ -102,3 +102,7 @@ gui = "python -m qoradfxm.gui"
 cli = "python -m qoradfxm.cli"
 test = "pytest"
 lint = "ruff check src && ruff format --check src"
+
+# violations present when ruff became mandatory in CI; remove entries as they are fixed
+[tool.ruff.lint.extend-per-file-ignores]
+"notebook/basic.ipynb" = ["RUF015"]
