@@ -10,11 +10,20 @@
 **Dark-Field X-ray Microscopy detector-image analysis: a pure Python engine with
 two front-ends, a headless CLI and a PySide6 desktop app.**
 
-```
-core/  pure engine (no Qt)  ←  cli/  headless front-end  ←  gui/  desktop app
+For DFXM beamline users who need to measure ring-shaped features in detector
+images shot by shot. QoraDFXM loads frames from HDF5 or image files, applies dark
+subtraction, flat-field division and display transforms, fits an ellipse to
+points picked on a ring, and collects centre, axes, tilt and fit error for every
+shot in one table (CSV). It can also sweep the fitted ellipse outward and report
+the mean brightness along it. The same steps run from the command line for batch
+work or in a desktop app for picking points by hand.
+
+```bash
+qoradfxm fit shot.h5 --dataset /run/scan00001/det/eh1hama_img/data     --op sub_bg:/dark --op log --points pts.json --out results.csv
 ```
 
-See [docs/ARCHITECTURE.md](https://github.com/NaNIsaac/QoraDFXM/blob/main/docs/ARCHITECTURE.md).
+`pts.json` is a list of `[x, y]` pixel coordinates on the ring (at least 5).
+Layer layout: [docs/ARCHITECTURE.md](https://github.com/NaNIsaac/QoraDFXM/blob/main/docs/ARCHITECTURE.md).
 
 ## Install
 
