@@ -1,7 +1,14 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="src/qoradfxm/gui/assets/logo_full_on_dark.png">
+  <img src="src/qoradfxm/gui/assets/logo_full.png" width="96" align="right" alt="">
+</picture>
+
 # QoraDFXM
 
-Dark-Field X-ray Microscopy detector-image analysis: a pure Python engine with
-two front-ends — a headless CLI and a PySide6 desktop app.
+[![CI](https://github.com/NaNIsaac/QoraDFXM/actions/workflows/ci.yml/badge.svg)](https://github.com/NaNIsaac/QoraDFXM/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
+**Dark-Field X-ray Microscopy detector-image analysis: a pure Python engine with
+two front-ends, a headless CLI and a PySide6 desktop app.**
 
 ```
 core/  pure engine (no Qt)  ←  cli/  headless front-end  ←  gui/  desktop app
