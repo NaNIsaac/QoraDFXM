@@ -8,13 +8,14 @@ from __future__ import annotations
 from . import fitting, io, ops, profile, transform, warp
 from .dataset import QoraDFXMDataset
 from .history import History
-from .ops import OP_LABELS, Operation
+from .ops import OP_LABELS, CorrectionError, Operation
 from .profile import RingProfile, ring_profile
 from .results import MASTER_COLUMNS, FitResult, ResultsFrame
 
 __all__ = [
     "MASTER_COLUMNS",
     "OP_LABELS",
+    "CorrectionError",
     "FitResult",
     "History",
     "Operation",

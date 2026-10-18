@@ -71,30 +71,45 @@ class Operation:
         return f"{base}  ⟵ {self.source}" if self.source else base
 
 
-def _resolve_ref(params: dict, base_path) -> np.ndarray | None:
-    """Load a reference array from its stored location."""
+class CorrectionError(ValueError):
+    """A dark/flat correction could not be applied as recorded."""
+
+
+def _resolve_ref(kind: str, params: dict, base_path, shape) -> np.ndarray:
+    """Load a reference array from its stored location, matching ``shape``.
+
+    Raises instead of falling back to the uncorrected image: a recipe that
+    says "dark subtracted" must never describe pixels that were not.
+    """
+    label = OP_LABELS.get(kind, kind)
     if "dataset_path" in params:
         if base_path is None:
-            return None
-        return np.asarray(
-            _io.load_dataset(base_path, params["dataset_path"]), dtype=np.float32
+            raise CorrectionError(
+                f"{label}: reference {params['dataset_path']!r} is a dataset path, "
+                "but this image has no source file to read it from"
+            )
+        ref = _io.load_dataset(base_path, params["dataset_path"])
+    elif "file_path" in params:
+        ref = _io.load_image_file(params["file_path"])
+    else:
+        raise CorrectionError(
+            f"{label}: no reference given (dataset_path or file_path)"
         )
-    if "file_path" in params:
-        return np.asarray(_io.load_image_file(params["file_path"]), dtype=np.float32)
-    return None
+    ref = np.asarray(ref, dtype=np.float32)
+    if ref.shape != shape:
+        raise CorrectionError(
+            f"{label}: reference {Operation(kind, params).source} has shape {ref.shape}, "
+            f"image has {shape}"
+        )
+    return ref
 
 
 def _op_sub_bg(img, params, base):
-    ref = _resolve_ref(params, base)
-    if ref is None or ref.shape != img.shape:
-        return img
-    return img - ref
+    return img - _resolve_ref("sub_bg", params, base, img.shape)
 
 
 def _op_divide(img, params, base):
-    ref = _resolve_ref(params, base)
-    if ref is None or ref.shape != img.shape:
-        return img
+    ref = _resolve_ref("divide", params, base, img.shape)
     denom = np.where(np.abs(ref) < 1e-12, np.nan, ref)
     return img / denom
 

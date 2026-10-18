@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
+import tifffile
 from conftest import DETECTOR_PATH
 
 from qoradfxm.cli import main
@@ -127,6 +128,13 @@ def test_fit_writes_a_master_row(ring_tif, points_json, tmp_path, capsys):
 def test_unknown_op_exits_with_code_2(ring_tif, capsys):
     assert main(["fit", str(ring_tif), "--op", "nope"]) == 2
     assert "unknown op" in capsys.readouterr().err
+
+
+def test_a_dark_frame_of_the_wrong_shape_exits_with_code_2(ring_tif, tmp_path, capsys):
+    dark = tmp_path / "dark.tif"
+    tifffile.imwrite(dark, np.zeros((3, 3), np.float32))
+    assert main(["fit", str(ring_tif), "--op", f"sub_bg:{dark}"]) == 2
+    assert "shape (3, 3)" in capsys.readouterr().err
 
 
 def test_ring_finds_the_true_radius(ring_tif, points_json, tmp_path, capsys):

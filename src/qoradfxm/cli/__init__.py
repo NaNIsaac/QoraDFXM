@@ -32,6 +32,7 @@ from ..core import (
     ring_profile,
 )
 from ..core import io as core_io
+from ..core.ops import CorrectionError
 from .spec import OP_ARG_HELP, SpecError, parse_ops
 
 __all__ = ["build_parser", "main"]
@@ -293,7 +294,7 @@ def main(argv=None) -> int:
     args = build_parser().parse_args(argv)
     try:
         return args.func(args)
-    except SpecError as exc:
+    except (SpecError, CorrectionError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
 

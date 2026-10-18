@@ -16,7 +16,7 @@ from PySide6 import QtCore, QtGui, QtWidgets
 
 from ..core import QoraDFXMDataset, io
 from ..core.history import History
-from ..core.ops import GEOMETRIC_KINDS
+from ..core.ops import GEOMETRIC_KINDS, CorrectionError
 from ..core.results import MASTER_COLUMNS, ResultsFrame
 from .icons import AppIcons, logo_icon, logo_pixmap, wordmark_pixmap
 from .image_view import COLORMAPS, ImageView
@@ -702,10 +702,14 @@ class MainWindow(QtWidgets.QMainWindow):
             return
         # Log is just another op in the Core pipeline (appended last / removed).
         if b and not doc.ds.log_scale:
-            doc.ds = doc.ds.apply_log()
+            new_ds = doc.ds.apply_log()
         elif not b and doc.ds.log_scale:
             ops = [op for op in doc.ds.history if op.kind != "log"]
-            doc.ds = doc.ds.set_history(History(tuple(ops)))
+            new_ds = doc.ds.set_history(History(tuple(ops)))
+        else:
+            new_ds = doc.ds
+        if not self._set_recipe(doc, new_ds):
+            return
         self._settings.setValue("persistent_log", b)
         self._log(f"Log scale {'ON' if b else 'OFF'}")
         self._after_preproc_change(doc)
@@ -731,7 +735,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 "구조/파일 탭에서 소스를 우클릭해 지정하세요", 5000
             )
             return
-        doc.ds = doc.ds.add_op(op_type, **(source or {}))
+        if not self._set_recipe(doc, doc.ds.add_op(op_type, **(source or {}))):
+            return
         self._log(f"전처리 추가: {doc.ds.history[-1].label()}  [{doc.file_path.name}]")
         if op_type in GEOMETRIC_KINDS:
             # The pixel grid moved: anything picked on the old grid is stale.
@@ -748,8 +753,8 @@ class MainWindow(QtWidgets.QMainWindow):
         if not 0 <= idx < len(ops):
             return
         del ops[idx]
-        doc.ds = doc.ds.set_history(History(tuple(ops)))
-        self._after_preproc_change(doc)
+        if self._set_recipe(doc, doc.ds.set_history(History(tuple(ops)))):
+            self._after_preproc_change(doc)
 
     def _preproc_move_at(self, doc, idx: int, delta: int) -> None:
         if doc is None or doc.ds is None:
@@ -759,8 +764,20 @@ class MainWindow(QtWidgets.QMainWindow):
         if not (0 <= idx < len(ops) and 0 <= j < len(ops)):
             return
         ops[idx], ops[j] = ops[j], ops[idx]
-        doc.ds = doc.ds.set_history(History(tuple(ops)))
-        self._after_preproc_change(doc)
+        if self._set_recipe(doc, doc.ds.set_history(History(tuple(ops)))):
+            self._after_preproc_change(doc)
+
+    def _set_recipe(self, doc, new_ds) -> bool:
+        """Adopt ``new_ds`` only if Core can replay it. A dark/flat reference
+        that is missing or the wrong shape keeps the previous recipe."""
+        try:
+            _ = new_ds.image
+        except CorrectionError as exc:
+            self._status.showMessage(f"전처리 실패: {exc}", 8000)
+            self._log(f"전처리 실패: {exc}  [{doc.file_path.name}]")
+            return False
+        doc.ds = new_ds
+        return True
 
     def _after_preproc_change(self, doc) -> None:
         """Push Core's recomputed image to the active view + refresh object tree

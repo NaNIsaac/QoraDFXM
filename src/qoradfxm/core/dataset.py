@@ -23,8 +23,23 @@ import numpy as np
 
 from . import io as _io
 from .history import History
-from .ops import BG_KINDS, NONLINEAR_KINDS, Operation, apply_op
+from .ops import (
+    BG_KINDS,
+    NONLINEAR_KINDS,
+    OP_LABELS,
+    CorrectionError,
+    Operation,
+    apply_op,
+)
 from .results import FitResult
+
+
+def _require_source(kind: str, source: dict) -> dict:
+    if "dataset_path" not in source and "file_path" not in source:
+        raise CorrectionError(
+            f"{OP_LABELS[kind]}: pass dataset_path=... or file_path=... for the reference"
+        )
+    return source
 
 
 @dataclass
@@ -78,11 +93,11 @@ class QoraDFXMDataset:
 
     def sub_bg(self, **source) -> QoraDFXMDataset:
         """Dark subtract. Source: dataset_path=... or file_path=..."""
-        return self._add_op("sub_bg", **source)
+        return self._add_op("sub_bg", **_require_source("sub_bg", source))
 
     def divide(self, **source) -> QoraDFXMDataset:
         """Flat-field divide. Source: dataset_path=... or file_path=..."""
-        return self._add_op("divide", **source)
+        return self._add_op("divide", **_require_source("divide", source))
 
     def apply_log(self) -> QoraDFXMDataset:
         return self._add_op("log")
@@ -174,6 +189,9 @@ class QoraDFXMDataset:
 
     @property
     def bg_applied(self) -> bool:
+        # Replay first: a correction that cannot run raises CorrectionError here
+        # rather than being reported as applied from the recipe alone.
+        _ = self.image
         return any(op.kind in BG_KINDS for op in self.history)
 
     @property

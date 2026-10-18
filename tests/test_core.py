@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import h5py
 import numpy as np
 import pytest
+import tifffile
 
-from qoradfxm.core import QoraDFXMDataset, warp
+from qoradfxm.core import CorrectionError, QoraDFXMDataset, warp
 from qoradfxm.core.history import History
 from qoradfxm.core.ops import GEOMETRIC_KINDS, NONLINEAR_KINDS, Operation, apply_op
 from qoradfxm.core.transform import adaptive_log
@@ -132,3 +134,56 @@ def test_adaptive_log_survives_nan_corners():
 def test_adaptive_log_of_all_nan_does_not_raise():
     out = adaptive_log(np.full((2, 2), np.nan, dtype=np.float32))
     assert np.isnan(out).all()
+
+
+# ------------------------------------------------------- dark / flat refs
+def test_sub_bg_without_a_reference_is_refused(img):
+    ds = QoraDFXMDataset.from_array(img)
+    with pytest.raises(CorrectionError, match=r"dataset_path=\.\.\. or file_path="):
+        ds.sub_bg()
+
+
+def test_a_recorded_correction_that_cannot_run_is_never_reported_applied(img):
+    # The GUI and CLI append through add_op, which takes the recipe as given.
+    ds = QoraDFXMDataset.from_array(img).add_op("sub_bg")
+    with pytest.raises(CorrectionError):
+        _ = ds.image
+    with pytest.raises(CorrectionError):
+        _ = ds.bg_applied
+
+
+def test_a_reference_with_the_wrong_shape_is_refused(img, tmp_path):
+    dark = tmp_path / "dark.tif"
+    tifffile.imwrite(dark, np.zeros((3, 3), np.float32))
+    ds = QoraDFXMDataset.from_array(img).sub_bg(file_path=str(dark))
+    with pytest.raises(CorrectionError, match=r"\(3, 3\).*\(6, 10\)"):
+        _ = ds.image
+
+
+def test_a_dataset_path_reference_needs_a_source_file(img):
+    ds = QoraDFXMDataset.from_array(img).divide(dataset_path="/flat")
+    with pytest.raises(CorrectionError, match="no source file"):
+        _ = ds.image
+
+
+def test_dark_and_flat_corrections_change_the_pixels(img, tmp_path):
+    dark, flat = tmp_path / "dark.tif", tmp_path / "flat.tif"
+    tifffile.imwrite(dark, np.full(img.shape, 2.0, np.float32))
+    tifffile.imwrite(flat, np.full(img.shape, 4.0, np.float32))
+    ds = (
+        QoraDFXMDataset.from_array(img)
+        .sub_bg(file_path=str(dark))
+        .divide(file_path=str(flat))
+    )
+    np.testing.assert_allclose(ds.image, (img - 2.0) / 4.0)
+    assert ds.bg_applied is True
+    assert ds.normalize().image.max() == pytest.approx(1.0)
+
+
+def test_dataset_path_references_are_read_from_the_source_h5(img, tmp_path):
+    h5 = tmp_path / "scan.h5"
+    with h5py.File(h5, "w") as f:
+        f["data"] = img
+        f["dark"] = np.ones_like(img)
+    ds = QoraDFXMDataset.from_h5(h5, "/data").sub_bg(dataset_path="/dark")
+    np.testing.assert_allclose(ds.image, img - 1.0)

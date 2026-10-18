@@ -59,7 +59,8 @@ Ops apply in the order given:
 
 `SRC` starting with `/` (and not an image suffix) is a dataset inside the same
 HDF5; anything else is a file path. Geometric ops change the image shape — put
-them before a fit, since points picked earlier no longer line up.
+them after `sub_bg`/`divide` (a reference of another shape is an error, not a
+skip) and before a fit, since points picked earlier no longer line up.
 Without `--points`, `fit` only reports the processed image stats.
 
 The desktop app also has its own entry point, `qoradfxm-gui [files...]`.

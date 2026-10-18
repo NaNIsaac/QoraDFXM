@@ -83,7 +83,11 @@ d = ds.to_dict()  # JSON-serializable recipe+result (→ SQLite, Phase 3)
 - **Reference data is a location, not an array.** Ops store `dataset_path`
   (same h5) or `file_path`; arrays resolve lazily at `.image` time via
   `source_path`. Keeps `History` serializable.
-- `bg_applied` / `log_scale` are derived from the history.
+- `bg_applied` / `log_scale` are derived from the history. `bg_applied` replays
+  it first, so a correction that cannot run is never reported as applied.
+- A `sub_bg` / `divide` whose reference is missing or has another shape raises
+  `CorrectionError` instead of passing the image through. The GUI keeps the
+  previous recipe and shows the message; the CLI exits with code 2.
 - `.undo()` → dataset with the last op dropped.
 
 ## Who owns which state
@@ -180,5 +184,6 @@ Preproc ops
   rotate (angle, expand), flip (h/v/both)
 
 Geometric ops resample the grid, so they change the image shape: a `sub_bg`
-whose reference no longer matches is skipped by the shape guard, and points
-picked before them are stale (the GUI warns). Put geometry first in the recipe.
+after them no longer matches its reference and raises `CorrectionError`, and
+points picked before them are stale (the GUI warns). Put geometry after the
+dark/flat corrections and before the fit.
