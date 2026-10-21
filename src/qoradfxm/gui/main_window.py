@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import tempfile
 import uuid
 from dataclasses import dataclass, field
@@ -25,6 +26,8 @@ from .prefs import ViewPrefs
 from .results_window import DropTableView, ResultsWindow
 from .ring_panel import RingProfilePanel
 from .roi import EllipseFitROI, LineProfileROI, RectRegionROI
+
+logger = logging.getLogger(__name__)
 
 APP_NAME = "QoraDFXM OptiCalc"
 APP_VERSION = "0.1.0"
@@ -2447,6 +2450,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def _add_dropped_files(self, paths: list) -> None:
         """Files dragged onto the table → basic-info rows (filename/frames)."""
         added = 0
+        unreadable: list[str] = []
         for raw in paths:
             p = Path(raw)
             if p.is_dir() or p.suffix.lower() not in self._SUPPORTED:
@@ -2455,8 +2459,11 @@ class MainWindow(QtWidgets.QMainWindow):
                 # one row per detector frame in the h5
                 try:
                     frames = io.list_frames(p)
-                except Exception:
-                    frames = []
+                except OSError as exc:
+                    logger.warning("cannot read %s: %s", p, exc)
+                    self._log(f"드롭 실패: {p.name} — {exc}")
+                    unreadable.append(p.name)
+                    continue
                 if frames:
                     for f in frames:
                         sid = self._shot_id_for_frame(p, f)
@@ -2473,7 +2480,13 @@ class MainWindow(QtWidgets.QMainWindow):
                 added += 1
         self._results_table.resizeColumnsToContents()
         self._log(f"드롭 → {added}개 행 추가")
-        self._status.showMessage(f"드롭한 파일에서 {added}개 행 추가", 4000)
+        if unreadable:
+            self._status.showMessage(
+                f"읽을 수 없는 h5 {len(unreadable)}개 건너뜀: {', '.join(unreadable)}",
+                8000,
+            )
+        else:
+            self._status.showMessage(f"드롭한 파일에서 {added}개 행 추가", 4000)
 
     def _new_table_row(self) -> None:
         """Append a blank row for manual data entry (cells are editable)."""
@@ -3020,8 +3033,8 @@ class MainWindow(QtWidgets.QMainWindow):
         if path.suffix.lower() == ".json":
             try:
                 text = json.dumps(json.loads(text), indent=2, ensure_ascii=False)
-            except Exception:
-                pass
+            except ValueError:
+                pass  # not valid JSON: show the raw text
         editor = QtWidgets.QPlainTextEdit()
         editor.setReadOnly(True)
         editor.setFont(QtGui.QFont("Consolas", 10))
