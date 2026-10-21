@@ -38,8 +38,10 @@ class FramePath:
 def list_frames(h5_file: Path | str) -> list[FramePath]:
     """Return every ``(scan, detector)`` pair that holds a ``data`` dataset.
 
-    Missing ``run`` group or malformed files yield an empty list rather than
-    raising, so the caller can report "nothing to show" cleanly.
+    A file without a ``run`` group, or without any detector ``data`` dataset,
+    yields an empty list so the caller can report "nothing to show". A file
+    that is not readable HDF5 raises ``OSError`` (h5py's behaviour); callers
+    decide whether to skip it.
     """
     frames: list[FramePath] = []
     with h5py.File(h5_file, "r") as hf:
