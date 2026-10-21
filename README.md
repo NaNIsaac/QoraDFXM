@@ -176,6 +176,16 @@ ds = (
 row = ds.to_record()  # one Master-table row
 ```
 
+## Validation
+
+All test data is **synthetic**; no measured data ships with the repository.
+
+- `examples/synthetic_ring_fit/` runs `qoradfxm fit` and `qoradfxm ring` on shots with a known
+  ellipse, ring radius and dark level, and on points with known jitter. `expected.json` keeps the
+  truth (with tolerances) apart from a regression snapshot;
+  `tests/test_example_synthetic_ring_fit.py` checks both. The fit-error tolerance was set from a
+  2000-seed sweep (see the example README).
+
 ## Dev
 
 ```bash
