@@ -35,11 +35,23 @@ Layer layout: [docs/ARCHITECTURE.md](https://github.com/NaNIsaac/QoraDFXM/blob/m
 
 ## Install
 
-Requires Python 3.14. Not on PyPI yet; install from GitHub or a clone. With [uv](https://docs.astral.sh/uv/), which also fetches Python 3.14 if you do not have it:
+Requires Python 3.14. Not on PyPI yet; install from GitHub or a clone. [uv](https://docs.astral.sh/uv/) fetches Python 3.14 if you do not have it. Install uv first if needed:
+
+<!-- test windows -->
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+<!-- test unix -->
+```sh
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+Then install QoraDFXM:
 
 <!-- test -->
 ```bash
-uv tool install "git+https://github.com/NaNIsaac/QoraDFXM"
+uv tool install --python 3.14 "git+https://github.com/NaNIsaac/QoraDFXM"
 ```
 
 Check that the command works (this is the headless install: engine + CLI, no Qt):
@@ -52,7 +64,7 @@ qoradfxm --help
 For the desktop app too, install the `gui` extra instead:
 
 ```bash
-uv tool install "qoradfxm[gui] @ git+https://github.com/NaNIsaac/QoraDFXM"
+uv tool install --python 3.14 "qoradfxm[gui] @ git+https://github.com/NaNIsaac/QoraDFXM"
 ```
 
 With pip on Python 3.14:
