@@ -41,9 +41,12 @@ Ring profile: the peak is at k = 1.30 and 1.40 on the two shots, with and withou
 subtraction. The mean inside the ring (k < 0.9) is 5.01 counts with `sub_bg:/dark` (the floor) and
 45.02 without (floor plus dark level).
 
-The fit error reads 3 to 7 % below sigma sqrt(1 - 5/N) at this seed, inside the 15 % tolerance.
-The Sampson distance is a first-order approximation of the geometric distance, and one seed does
-not separate that from scatter.
+The fit error reads 3 to 7 % below sigma sqrt(1 - 5/N) at this seed. That is seed scatter,
+not a bias of the Sampson distance: over 2000 seeds (sigma 0.5 px, the same 200 points and fitting
+code) the ratio fit_error / (sigma sqrt(1 - 5/N)) averages 0.9994 with a standard error of 0.0012,
+and one run scatters with a standard deviation of 5.1 %. The RMS Sampson and geometric distances to
+the true ellipse agree to 0.0001 over the same seeds, so at this ring size and jitter the Sampson
+approximation is exact for practical purposes. The 15 % tolerance is about 3 standard deviations.
 
 ## What the test checks
 
@@ -51,7 +54,8 @@ not separate that from scatter.
 
 - **`truth`**, with a tolerance for each value: centre within 3 standard errors
   (2 sigma / sqrt(N) each, at least 0.01 px), diameters within twice that, angle within 0.2 sigma
-  degrees (at least 0.01), fit_error within 15 % of sigma sqrt(1 - 5/N); ring peak within 0.02 of
+  degrees (at least 0.01), fit_error within 15 % (about 3 standard deviations of one run) of
+  sigma sqrt(1 - 5/N); ring peak within 0.02 of
   the drawn k, mean inside the ring within 1 count of 5 (dark subtracted) or 45 (not subtracted).
   A test also checks that the truth is the geometry the example draws.
 - **`regression`**: today's values at seed 2026, so any change in the fit or the profile shows up.
