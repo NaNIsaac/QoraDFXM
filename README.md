@@ -24,10 +24,13 @@ work or in a desktop app for picking points by hand.
 the inner ellipse are fitted; the ring profile tab peaks at k = 1.3.*
 
 ```bash
-qoradfxm fit shot.h5 --dataset /run/scan00001/det/eh1hama_img/data     --op sub_bg:/dark --op log --points pts.json --out results.csv
+qoradfxm fit shot.h5 --dataset /run/scan00001/det/camera/data     --op sub_bg:/dark --op log --points pts.json --out results.csv
 ```
 
 `pts.json` is a list of `[x, y]` pixel coordinates on the ring (at least 5).
+`python examples/synthetic_ring.py` writes synthetic `ring.tif`, `pts.json`,
+`shot.h5` and `shot2.h5` to `examples/data/` to try these commands on; no
+measured data ships with the repo.
 Layer layout: [docs/ARCHITECTURE.md](https://github.com/NaNIsaac/QoraDFXM/blob/main/docs/ARCHITECTURE.md).
 
 ## Install
@@ -54,7 +57,7 @@ uv sync --no-dev            # engine + CLI only, no Qt
 qoradfxm info shot.h5 [--tree]                    # frames, shapes, HDF5 structure
 qoradfxm convert dat/ -o tif/                     # export detector frames to TIFF
 qoradfxm fit shot.h5 \
-    --dataset /run/scan00001/det/eh1hama_img/data \
+    --dataset /run/scan00001/det/camera/data \
     --op sub_bg:/dark --op divide:flat.tif --op gamma:0.5 --op log \
     --points pts.json --out results.csv
 qoradfxm ring shot.h5 --points pts.json \
@@ -88,11 +91,12 @@ Example on the same synthetic ring image, with eight points on the inner
 ellipse (centre 200, 150; semi-axes 120, 60; 30°):
 
 ```console
+$ python examples/synthetic_ring.py && cd examples/data
 $ qoradfxm fit ring.tif --points pts.json --out results.csv
 wrote results.csv (1 row)
 $ cat results.csv
 shot_id,status,center_x,center_y,major_axis,minor_axis,angle_deg,fit_error,points_json,bg_applied,log_scale
-ring,OK,200.0,150.0,240.00157168475886,120.00078610129981,29.998661369599404,0.002452465539931566,"[[303.92, 210.0], [252.27, 229.17], [170.0, 201.96], [105.3, 144.32], [96.08, 90.0], [147.73, 70.83], [230.0, 98.04], [294.7, 155.68]]",False,False
+ring,OK,200.0,150.00000000000003,240.00157168475877,120.00078610129981,29.998661369599404,0.0024524655399003918,"[[303.92, 210.0], [252.27, 229.17], [170.0, 201.96], [105.3, 144.32], [96.08, 90.0], [147.73, 70.83], [230.0, 98.04], [294.7, 155.68]]",False,False
 $ qoradfxm ring ring.tif --points pts.json --k 0.5:2.0:0.005 --width 3 --out ring.csv
 shot_id  : ring
 ellipse  : a=120.00 b=60.00 px, angle=30.00°
@@ -110,7 +114,7 @@ Module form (no install step): `python -m qoradfxm.cli ...`, `python -m qoradfxm
 ```python
 from qoradfxm.core import QoraDFXMDataset
 
-ds = (QoraDFXMDataset.from_h5("shot.h5", "/run/scan00001/det/eh1hama_img/data")
+ds = (QoraDFXMDataset.from_h5("shot.h5", "/run/scan00001/det/camera/data")
         .sub_bg(dataset_path="/dark")
         .apply_log()
         .fit_ellipse(points))
