@@ -35,14 +35,34 @@ Layer layout: [docs/ARCHITECTURE.md](https://github.com/NaNIsaac/QoraDFXM/blob/m
 
 ## Install
 
-Requires Python 3.14. Not on PyPI yet; install from GitHub or a clone:
+Requires Python 3.14. Not on PyPI yet; install from GitHub or a clone. With [uv](https://docs.astral.sh/uv/), which also fetches Python 3.14 if you do not have it:
+
+<!-- test -->
+```bash
+uv tool install "git+https://github.com/NaNIsaac/QoraDFXM"
+```
+
+Check that the command works (this is the headless install: engine + CLI, no Qt):
+
+<!-- test -->
+```bash
+qoradfxm --help
+```
+
+For the desktop app too, install the `gui` extra instead:
+
+```bash
+uv tool install "qoradfxm[gui] @ git+https://github.com/NaNIsaac/QoraDFXM"
+```
+
+With pip on Python 3.14:
 
 ```bash
 pip install "qoradfxm[gui] @ git+https://github.com/NaNIsaac/QoraDFXM"   # desktop app
 pip install "git+https://github.com/NaNIsaac/QoraDFXM"                  # headless: engine + CLI, no Qt
 ```
 
-From a clone with [uv](https://docs.astral.sh/uv/):
+From a clone:
 
 ```bash
 uv sync                     # engine + CLI + GUI (the dev group pulls qoradfxm[gui])
@@ -50,6 +70,21 @@ uv sync --no-dev            # engine + CLI only, no Qt
 ```
 
 `cupy` (GPU) is an opt-in extra: `uv sync --extra cuda`.
+
+## First run
+
+Generate the synthetic ring image from a clone and fit its ellipse:
+
+<!-- test -->
+```bash
+git clone https://github.com/NaNIsaac/QoraDFXM
+cd QoraDFXM
+uv sync --no-dev
+uv run python examples/synthetic_ring.py
+cd examples/data
+uv run qoradfxm fit ring.tif --points pts.json --out results.csv
+test -s results.csv
+```
 
 ## CLI
 
