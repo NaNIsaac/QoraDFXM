@@ -120,11 +120,13 @@ Module form (no install step): `python -m qoradfxm.cli ...`, `python -m qoradfxm
 ```python
 from qoradfxm.core import QoraDFXMDataset
 
-ds = (QoraDFXMDataset.from_h5("shot.h5", "/run/scan00001/det/camera/data")
-        .sub_bg(dataset_path="/dark")
-        .apply_log()
-        .fit_ellipse(points))
-row = ds.to_record()   # one Master-table row
+ds = (
+    QoraDFXMDataset.from_h5("shot.h5", "/run/scan00001/det/camera/data")
+    .sub_bg(dataset_path="/dark")
+    .apply_log()
+    .fit_ellipse(points)
+)
+row = ds.to_record()  # one Master-table row
 ```
 
 ## Dev

@@ -49,9 +49,10 @@ could have typed, as a child process (`gui/cli_bridge.py`):
 
 ```python
 from .cli_bridge import CliJob, argv_for_dataset
+
 job = CliJob(self)
-job.line.connect(self._log)                    # stdout/stderr, line by line
-job.finished_ok.connect(self._on_job_done)     # exit code
+job.line.connect(self._log)  # stdout/stderr, line by line
+job.finished_ok.connect(self._on_job_done)  # exit code
 job.start(argv_for_dataset(doc.ds, points_file=pts, out="results.csv"))
 ```
 
