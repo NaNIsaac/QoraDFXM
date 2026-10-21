@@ -101,7 +101,7 @@ def test_argv_needs_a_source_path():
 def test_info_lists_frames_and_shapes(ring_h5, capsys):
     assert main(["info", str(ring_h5)]) == 0
     out = capsys.readouterr().out
-    assert "eh1hama_img" in out and "(300, 400)" in out
+    assert "camera" in out and "(300, 400)" in out
 
 
 def test_fit_without_points_reports_image_stats(ring_tif, capsys):

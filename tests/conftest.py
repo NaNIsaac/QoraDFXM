@@ -18,7 +18,7 @@ RING_K = 1.3  # the bright ring sits at k = 1.3
 RING_SIGMA = 0.05  # in k units
 RING_AMP = 100.0
 RING_FLOOR = 5.0
-DETECTOR_PATH = "run/scan00001/det/eh1hama_img/data"
+DETECTOR_PATH = "run/scan00001/det/camera/data"
 
 
 def make_ring_image(h: int = 300, w: int = 400) -> np.ndarray:
@@ -78,7 +78,7 @@ def ring_h5(tmp_path, ring_image):
     path = tmp_path / "shot.h5"
     with h5py.File(path, "w") as hf:
         hf.create_dataset(DETECTOR_PATH, data=ring_image[None, ...])
-        hf.create_dataset("run/scan00001/det/eh1hama_img/dark", data=ring_image[None])
+        hf.create_dataset("run/scan00001/det/camera/dark", data=ring_image[None])
     return path
 
 

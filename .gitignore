@@ -10,3 +10,6 @@ wheels/
 .venv
 
 .codigest/
+
+# Output of examples/synthetic_ring.py
+examples/data/
