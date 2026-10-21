@@ -106,6 +106,12 @@ note     : some rings leave the image (min valid fraction 0.56)
 wrote ring.csv (301 rows)
 ```
 
+Columns of `results.csv`: everything is in pixels of the processed image (after any geometric
+`--op`), with x to the right and y down. `major_axis` and `minor_axis` are the full **diameters**
+(240 and 120 above for semi-axes 120 and 60). `angle_deg` is the angle of the major axis from +x,
+measured in those image coordinates. `fit_error` is the RMS Sampson distance of the picked points
+from the fitted ellipse.
+
 The desktop app also has its own entry point, `qoradfxm-gui [files...]`.
 Module form (no install step): `python -m qoradfxm.cli ...`, `python -m qoradfxm.gui`.
 
