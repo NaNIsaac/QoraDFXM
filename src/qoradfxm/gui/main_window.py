@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import tempfile
 import uuid
+import warnings
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -17,7 +18,7 @@ from PySide6 import QtCore, QtGui, QtWidgets
 from ..core import QoraDFXMDataset, io
 from ..core.history import History
 from ..core.ops import GEOMETRIC_KINDS, CorrectionError
-from ..core.results import MASTER_COLUMNS, ResultsFrame
+from ..core.results import MASTER_COLUMNS, ResultsFrame, UnknownColumnsWarning
 from .icons import AppIcons, logo_icon, logo_pixmap, wordmark_pixmap
 from .image_view import COLORMAPS, ImageView
 from .models import COLUMN_LABELS, MasterTableModel
@@ -2500,13 +2501,27 @@ class MainWindow(QtWidgets.QMainWindow):
         if not path:
             return
         try:
-            self._master.set_results(ResultsFrame.from_csv(path))
+            with warnings.catch_warnings(record=True) as caught:
+                warnings.simplefilter("always")
+                frame = ResultsFrame.from_csv(path)
+            self._master.set_results(frame)
         except Exception as exc:
             self._status.showMessage(f"CSV 불러오기 실패: {exc}", 6000)
             return
         self._show_results_table()
         self._results_table.resizeColumnsToContents()
         self._log(f"CSV 불러옴: {path} ({self._master.rowCount()}행)")
+        ignored = [
+            c
+            for w in caught
+            if isinstance(w.message, UnknownColumnsWarning)
+            for c in w.message.columns
+        ]
+        if ignored:
+            self._log(f"무시한 열: {', '.join(ignored)}")
+            self._status.showMessage(
+                f"CSV 불러옴, 결과 열이 아니라 무시한 열: {', '.join(ignored)}", 8000
+            )
 
     def _del_selected_row(self) -> None:
         sel = self._results_table.selectionModel()

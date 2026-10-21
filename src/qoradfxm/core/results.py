@@ -55,6 +55,14 @@ _DTYPES = {
 }
 
 
+class UnknownColumnsWarning(UserWarning):
+    """A CSV had columns that are not results columns; ``columns`` lists them."""
+
+    def __init__(self, message: str, columns: list[str]) -> None:
+        super().__init__(message)
+        self.columns = columns
+
+
 @dataclass
 class FitResult:
     """One ellipse fit: geometry + quality + the points it came from."""
@@ -212,7 +220,10 @@ class ResultsFrame:
         unknown = [str(c) for c in df.columns if c not in MASTER_COLUMNS]
         if unknown:
             warnings.warn(
-                f"{path}: ignoring columns that are not results columns: {', '.join(unknown)}",
+                UnknownColumnsWarning(
+                    f"{path}: ignoring columns that are not results columns: {', '.join(unknown)}",
+                    unknown,
+                ),
                 stacklevel=2,
             )
         return cls(df)

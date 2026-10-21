@@ -9,7 +9,7 @@ import tifffile
 from conftest import DETECTOR_PATH, ellipse_points
 
 from qoradfxm.core import fitting, io
-from qoradfxm.core.results import FitResult, ResultsFrame
+from qoradfxm.core.results import FitResult, ResultsFrame, UnknownColumnsWarning
 
 
 # ------------------------------------------------------------------ ellipse fit
@@ -127,3 +127,11 @@ def test_a_colour_tif_is_still_converted_to_gray(tmp_path):
     img = io.load_image_file(path)
     assert img.shape == (8, 9)
     assert float(img[0, 0]) == 30.0
+
+
+def test_the_extra_column_warning_lists_the_dropped_columns(tmp_path):
+    path = tmp_path / "extra.csv"
+    path.write_text("shot_id,note,tag\nA,x,y\n", encoding="utf-8")
+    with pytest.warns(UnknownColumnsWarning) as record:
+        ResultsFrame.from_csv(str(path))
+    assert record[0].message.columns == ["note", "tag"]
