@@ -134,11 +134,13 @@ def wait_until(qapp):
 
     QFileSystemModel fills a folder on a worker thread, so a fixed pump passes on
     an idle machine and can fail on a loaded one (#14). Waiting on the condition
-    itself does not depend on how busy the machine is.
+    itself does not depend on how busy the machine is. The timeout is 30 s because with every
+    core busy the worker thread can take longer than 10 s to deliver a folder (#8: 1 of 20 runs
+    failed at 10 s under 12 busy processes; 20 of 20 passed at 30 s, and with one core free).
     """
     from PySide6 import QtCore
 
-    def _wait(predicate, describe=lambda: "", timeout_ms: int = 10_000) -> None:
+    def _wait(predicate, describe=lambda: "", timeout_ms: int = 30_000) -> None:
         t = QtCore.QElapsedTimer()
         t.start()
         while not predicate():
