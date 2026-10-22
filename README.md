@@ -81,7 +81,7 @@ uv sync                     # engine + CLI + GUI (the dev group pulls qoradfxm[g
 uv sync --no-dev            # engine + CLI only, no Qt
 ```
 
-`cupy` (GPU) is an opt-in extra: `uv sync --extra cuda`.
+`cupy` (GPU) is an opt-in extra, `uv sync --extra cuda`, used only by `notebook/basic.ipynb`; the package itself runs on the CPU.
 
 ## First run
 
