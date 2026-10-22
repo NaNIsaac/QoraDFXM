@@ -419,17 +419,17 @@ def test_diving_in_and_back_out_returns_where_you_were(main_window, tmp_path, pu
 
 
 # ------------------------------------------------ explorer arrow-key preview
-def test_arrow_keys_move_the_preview(main_window, three_tifs, pump):
+def test_arrow_keys_move_the_preview(main_window, three_tifs, pump, wait_until):
     from PySide6 import QtCore, QtGui, QtWidgets
 
     folder = three_tifs[0].parent
     tree, model = main_window._tree, main_window._fs_model
     model.setRootPath(str(folder))
     tree.setRootIndex(model.index(str(folder)))
-    for _ in range(20):  # QFileSystemModel populates asynchronously
-        pump(100)
-        if model.rowCount(tree.rootIndex()) >= len(three_tifs):
-            break
+    wait_until(
+        lambda: model.rowCount(tree.rootIndex()) >= len(three_tifs),
+        lambda: listing_state(main_window),
+    )
     rows = [
         model.index(r, 0, tree.rootIndex())
         for r in range(model.rowCount(tree.rootIndex()))
@@ -449,23 +449,27 @@ def test_arrow_keys_move_the_preview(main_window, three_tifs, pump):
             QtCore.QEvent.KeyPress, QtCore.Qt.Key_Down, QtCore.Qt.NoModifier
         ),
     )
-    pump(400)
-    assert main_window._cur().file_path != first
+    wait_until(
+        lambda: main_window._cur().file_path != first,
+        lambda: f"still on {first}; {listing_state(main_window)}",
+    )
     assert main_window._cur().preview is True
     assert main_window._tabs.count() == 1, "navigation must not stack tabs"
 
 
-def test_arrow_keys_do_nothing_without_a_preview_tab(main_window, three_tifs, pump):
+def test_arrow_keys_do_nothing_without_a_preview_tab(
+    main_window, three_tifs, pump, wait_until
+):
     from PySide6 import QtCore, QtGui, QtWidgets
 
     folder = three_tifs[0].parent
     tree, model = main_window._tree, main_window._fs_model
     model.setRootPath(str(folder))
     tree.setRootIndex(model.index(str(folder)))
-    for _ in range(20):
-        pump(100)
-        if model.rowCount(tree.rootIndex()) >= len(three_tifs):
-            break
+    wait_until(
+        lambda: model.rowCount(tree.rootIndex()) >= len(three_tifs),
+        lambda: listing_state(main_window),
+    )
 
     main_window._open_document(three_tifs[0], preview=False)  # pinned
     pinned = main_window._cur().file_path
