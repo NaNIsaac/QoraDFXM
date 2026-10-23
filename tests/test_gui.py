@@ -293,38 +293,61 @@ def listing(main_window) -> list[str]:
     )
 
 
-def test_filter_narrows_the_listing(main_window, mixed_folder, pump):
+UNFILTERED = [
+    "alignment_01.tif",
+    "notes.txt",
+    "shockwave_01.tif",
+    "shockwave_02.tif",
+    "sub",
+]
+FILTERED = ["shockwave_01.tif", "shockwave_02.tif", "sub"]
+
+
+def listing_state(main_window) -> str:
+    """What the explorer shows and why, for a failure message.
+
+    An empty listing with a valid root means QFileSystemModel never populated the
+    folder; a full one with the wrong names means the filter was not applied.
+    """
+    model, root = main_window._fs_model, main_window._tree.rootIndex()
+    return (
+        f"listing={listing(main_window)} rowCount={model.rowCount(root)} "
+        f"canFetchMore={model.canFetchMore(root)} root={model.filePath(root)!r} "
+        f"rootPath={model.rootPath()!r} nameFilters={model.nameFilters()} "
+        f"text={main_window._filter_edit.text()!r} "
+        f"timer_active={main_window._filter_timer.isActive()}"
+    )
+
+
+def wait_for_listing(main_window, wait_until, want: list[str]) -> None:
+    wait_until(lambda: listing(main_window) == want, lambda: listing_state(main_window))
+
+
+def test_filter_narrows_the_listing(main_window, mixed_folder, wait_until):
     main_window._set_tree_root(mixed_folder)
-    pump(300)
-    assert "alignment_01.tif" in listing(main_window)
+    wait_for_listing(main_window, wait_until, UNFILTERED)
 
     main_window._filter_edit.setText("shock")
-    pump(300)
-    names = listing(main_window)
-    assert names.count("shockwave_01.tif") == 1
-    assert "alignment_01.tif" not in names and "notes.txt" not in names
+    wait_for_listing(main_window, wait_until, FILTERED)
 
 
-def test_filter_keeps_folders_visible(main_window, mixed_folder, pump):
+def test_filter_keeps_folders_visible(main_window, mixed_folder, wait_until):
     """Otherwise you could not browse while a filter is active."""
     main_window._set_tree_root(mixed_folder)
     main_window._filter_edit.setText("shock")
-    pump(300)
-    assert "sub" in listing(main_window)
+    wait_for_listing(main_window, wait_until, FILTERED)  # "sub" survives the filter
 
 
-def test_clearing_the_filter_restores_everything(main_window, mixed_folder, pump):
+def test_clearing_the_filter_restores_everything(main_window, mixed_folder, wait_until):
     main_window._set_tree_root(mixed_folder)
-    pump(300)
-    full = listing(main_window)
+    wait_for_listing(main_window, wait_until, UNFILTERED)
     main_window._filter_edit.setText("shock")
-    pump(300)
+    wait_for_listing(main_window, wait_until, FILTERED)
     main_window._filter_edit.clear()
-    pump(300)
-    assert listing(main_window) == full
+    wait_for_listing(main_window, wait_until, UNFILTERED)
 
 
-def test_filter_survives_changing_folder(main_window, mixed_folder, pump):
+def test_filter_survives_changing_folder(main_window, mixed_folder, wait_until):
     (mixed_folder / "sub" / "shockwave_09.tif").parent.mkdir(exist_ok=True)
     tifffile.imwrite(
         mixed_folder / "sub" / "shockwave_09.tif", np.zeros((4, 4), np.float32)
@@ -332,14 +355,13 @@ def test_filter_survives_changing_folder(main_window, mixed_folder, pump):
     tifffile.imwrite(mixed_folder / "sub" / "other.tif", np.zeros((4, 4), np.float32))
     main_window._set_tree_root(mixed_folder)
     main_window._filter_edit.setText("shock")
-    pump(300)
+    wait_for_listing(main_window, wait_until, FILTERED)
     main_window._set_tree_root(mixed_folder / "sub")
-    pump(300)
-    assert listing(main_window) == ["shockwave_09.tif"]
+    wait_for_listing(main_window, wait_until, ["shockwave_09.tif"])
 
 
 def test_escape_clears_the_filter_and_returns_to_the_tree(
-    main_window, mixed_folder, pump
+    main_window, mixed_folder, wait_until
 ):
     from PySide6 import QtCore
     from PySide6.QtTest import QTest
@@ -347,11 +369,10 @@ def test_escape_clears_the_filter_and_returns_to_the_tree(
     main_window._set_tree_root(mixed_folder)
     main_window._filter_edit.setFocus()
     main_window._filter_edit.setText("shock")
-    pump(200)
+    wait_for_listing(main_window, wait_until, FILTERED)
     QTest.keyClick(main_window._filter_edit, QtCore.Qt.Key_Escape)
-    pump(300)
+    wait_for_listing(main_window, wait_until, UNFILTERED)
     assert main_window._filter_edit.text() == ""
-    assert "alignment_01.tif" in listing(main_window)
 
 
 def test_ctrl_f_focuses_the_filter(main_window):
@@ -477,3 +498,21 @@ def test_csv_import_reports_the_columns_it_ignored(main_window, tmp_path, monkey
 
     assert main_window._master.rowCount() == 1
     assert "note" in main_window._status.currentMessage()
+
+
+# ------------------------------------------------------------ dropped files
+def test_dropped_corrupt_h5_is_reported_not_added(main_window, tmp_path, ring_h5):
+    bad = tmp_path / "broken.h5"
+    bad.write_bytes(b"this is not an hdf5 file")
+
+    main_window._add_dropped_files([bad, ring_h5])
+
+    ids = [main_window._master.index_of(sid) for sid in ("broken", "shot")]
+    assert ids[0] is None
+    assert main_window._shot_map
+    assert "broken.h5" in main_window._status.currentMessage()
+
+
+def test_dropped_valid_h5_adds_a_row(main_window, ring_h5):
+    main_window._add_dropped_files([ring_h5])
+    assert main_window._master.rowCount() == 1

@@ -1,0 +1,329 @@
+{
+  "about": "Checked by tests/test_example_synthetic_ring_fit.py. Units: centre, diameters (major_axis, minor_axis are full diameters) and fit_error (RMS Sampson distance) in pixels of the processed image, x right and y down; angle_deg from +x in those coordinates; ring k is the scale of the fitted ellipse; means in counts per pixel along the contour.",
+  "truth": {
+    "about": "The ellipse and ring that were drawn: centre (200, 150) px, semi-axes 120 and 60 px, 30 deg, ring at k = 1.3 and 1.4 on a floor of 5 counts, dark level 40 counts. Expected fit_error for jitter sigma and N = 200 points: sigma * sqrt(1 - 5/N). Position tolerances: 3 standard errors, about 2 sigma / sqrt(N) each.",
+    "fits": [
+      {
+        "jitter_px": 0.0,
+        "center_x": {
+          "value": 200.0,
+          "tol": 0.01
+        },
+        "center_y": {
+          "value": 150.0,
+          "tol": 0.01
+        },
+        "major_axis": {
+          "value": 240.0,
+          "tol": 0.02
+        },
+        "minor_axis": {
+          "value": 120.0,
+          "tol": 0.02
+        },
+        "angle_deg": {
+          "value": 30.0,
+          "tol": 0.01
+        },
+        "fit_error": {
+          "value": 0.0,
+          "tol": 0.01
+        }
+      },
+      {
+        "jitter_px": 0.25,
+        "center_x": {
+          "value": 200.0,
+          "tol": 0.106
+        },
+        "center_y": {
+          "value": 150.0,
+          "tol": 0.106
+        },
+        "major_axis": {
+          "value": 240.0,
+          "tol": 0.212
+        },
+        "minor_axis": {
+          "value": 120.0,
+          "tol": 0.212
+        },
+        "angle_deg": {
+          "value": 30.0,
+          "tol": 0.05
+        },
+        "fit_error": {
+          "value": 0.2469,
+          "tol": 0.037
+        }
+      },
+      {
+        "jitter_px": 0.5,
+        "center_x": {
+          "value": 200.0,
+          "tol": 0.212
+        },
+        "center_y": {
+          "value": 150.0,
+          "tol": 0.212
+        },
+        "major_axis": {
+          "value": 240.0,
+          "tol": 0.424
+        },
+        "minor_axis": {
+          "value": 120.0,
+          "tol": 0.424
+        },
+        "angle_deg": {
+          "value": 30.0,
+          "tol": 0.1
+        },
+        "fit_error": {
+          "value": 0.4937,
+          "tol": 0.0741
+        }
+      },
+      {
+        "jitter_px": 1.0,
+        "center_x": {
+          "value": 200.0,
+          "tol": 0.424
+        },
+        "center_y": {
+          "value": 150.0,
+          "tol": 0.424
+        },
+        "major_axis": {
+          "value": 240.0,
+          "tol": 0.848
+        },
+        "minor_axis": {
+          "value": 120.0,
+          "tol": 0.848
+        },
+        "angle_deg": {
+          "value": 30.0,
+          "tol": 0.2
+        },
+        "fit_error": {
+          "value": 0.9874,
+          "tol": 0.1481
+        }
+      }
+    ],
+    "rings": {
+      "k1.3_sub": {
+        "peak_k": {
+          "value": 1.3,
+          "tol": 0.02
+        },
+        "inside_mean": {
+          "value": 5.0,
+          "tol": 1.0
+        }
+      },
+      "k1.3_raw": {
+        "peak_k": {
+          "value": 1.3,
+          "tol": 0.02
+        },
+        "inside_mean": {
+          "value": 45.0,
+          "tol": 1.0
+        }
+      },
+      "k1.4_sub": {
+        "peak_k": {
+          "value": 1.4,
+          "tol": 0.02
+        },
+        "inside_mean": {
+          "value": 5.0,
+          "tol": 1.0
+        }
+      },
+      "k1.4_raw": {
+        "peak_k": {
+          "value": 1.4,
+          "tol": 0.02
+        },
+        "inside_mean": {
+          "value": 45.0,
+          "tol": 1.0
+        }
+      }
+    }
+  },
+  "regression": {
+    "about": "What the commands return today at seed 2026 (not the truth): a change here means the fit or the ring profile changed.",
+    "fits": [
+      {
+        "jitter_px": 0.0,
+        "center_x": {
+          "value": 200.0,
+          "tol": 0.002
+        },
+        "center_y": {
+          "value": 150.0,
+          "tol": 0.002
+        },
+        "major_axis": {
+          "value": 239.998,
+          "tol": 0.002
+        },
+        "minor_axis": {
+          "value": 120.0011,
+          "tol": 0.002
+        },
+        "angle_deg": {
+          "value": 29.9997,
+          "tol": 0.002
+        },
+        "fit_error": {
+          "value": 0.0027,
+          "tol": 0.002
+        }
+      },
+      {
+        "jitter_px": 0.25,
+        "center_x": {
+          "value": 200.0224,
+          "tol": 0.002
+        },
+        "center_y": {
+          "value": 149.9995,
+          "tol": 0.002
+        },
+        "major_axis": {
+          "value": 239.9909,
+          "tol": 0.002
+        },
+        "minor_axis": {
+          "value": 120.0385,
+          "tol": 0.002
+        },
+        "angle_deg": {
+          "value": 29.9701,
+          "tol": 0.002
+        },
+        "fit_error": {
+          "value": 0.2296,
+          "tol": 0.002
+        }
+      },
+      {
+        "jitter_px": 0.5,
+        "center_x": {
+          "value": 200.0365,
+          "tol": 0.002
+        },
+        "center_y": {
+          "value": 149.9661,
+          "tol": 0.002
+        },
+        "major_axis": {
+          "value": 239.9518,
+          "tol": 0.002
+        },
+        "minor_axis": {
+          "value": 119.833,
+          "tol": 0.002
+        },
+        "angle_deg": {
+          "value": 29.9309,
+          "tol": 0.002
+        },
+        "fit_error": {
+          "value": 0.4759,
+          "tol": 0.002
+        }
+      },
+      {
+        "jitter_px": 1.0,
+        "center_x": {
+          "value": 200.0206,
+          "tol": 0.002
+        },
+        "center_y": {
+          "value": 149.993,
+          "tol": 0.002
+        },
+        "major_axis": {
+          "value": 240.1026,
+          "tol": 0.002
+        },
+        "minor_axis": {
+          "value": 119.9487,
+          "tol": 0.002
+        },
+        "angle_deg": {
+          "value": 29.9524,
+          "tol": 0.002
+        },
+        "fit_error": {
+          "value": 0.9581,
+          "tol": 0.002
+        }
+      }
+    ],
+    "rings": {
+      "k1.3_sub": {
+        "peak_k": {
+          "value": 1.3,
+          "tol": 0.005
+        },
+        "peak_mean": {
+          "value": 104.35,
+          "tol": 0.05
+        },
+        "inside_mean": {
+          "value": 5.01,
+          "tol": 0.05
+        }
+      },
+      "k1.3_raw": {
+        "peak_k": {
+          "value": 1.3,
+          "tol": 0.005
+        },
+        "peak_mean": {
+          "value": 144.326,
+          "tol": 0.05
+        },
+        "inside_mean": {
+          "value": 45.016,
+          "tol": 0.05
+        }
+      },
+      "k1.4_sub": {
+        "peak_k": {
+          "value": 1.4,
+          "tol": 0.005
+        },
+        "peak_mean": {
+          "value": 104.402,
+          "tol": 0.05
+        },
+        "inside_mean": {
+          "value": 5.006,
+          "tol": 0.05
+        }
+      },
+      "k1.4_raw": {
+        "peak_k": {
+          "value": 1.4,
+          "tol": 0.005
+        },
+        "peak_mean": {
+          "value": 144.357,
+          "tol": 0.05
+        },
+        "inside_mean": {
+          "value": 45.023,
+          "tol": 0.05
+        }
+      }
+    }
+  }
+}

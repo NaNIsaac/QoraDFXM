@@ -129,6 +129,30 @@ def pump(qapp):
 
 
 @pytest.fixture
+def wait_until(qapp):
+    """Run the event loop until ``predicate()`` holds; fail with ``describe()`` after a timeout.
+
+    QFileSystemModel fills a folder on a worker thread, so a fixed pump passes on
+    an idle machine and can fail on a loaded one (#14). Waiting on the condition
+    itself does not depend on how busy the machine is. The timeout is 30 s because with every
+    core busy the worker thread can take longer than 10 s to deliver a folder (#8: 1 of 20 runs
+    failed at 10 s under 12 busy processes; 20 of 20 passed at 30 s, and with one core free).
+    """
+    from PySide6 import QtCore
+
+    def _wait(predicate, describe=lambda: "", timeout_ms: int = 30_000) -> None:
+        t = QtCore.QElapsedTimer()
+        t.start()
+        while not predicate():
+            if t.elapsed() > timeout_ms:
+                pytest.fail(f"not reached after {timeout_ms} ms: {describe()}")
+            qapp.processEvents()
+            QtCore.QThread.msleep(5)
+
+    return _wait
+
+
+@pytest.fixture
 def main_window(qapp):
     """A fresh window with fresh settings.
 
@@ -144,3 +168,10 @@ def main_window(qapp):
     win.show()
     yield win
     win.close()
+    # close() only hides the window. Delete it and its file model, so the model's
+    # gatherer thread and file watchers do not keep running into later tests.
+    model = win._fs_model
+    win.deleteLater()
+    model.deleteLater()
+    QtCore.QCoreApplication.sendPostedEvents(None, QtCore.QEvent.DeferredDelete)
+    qapp.processEvents()
