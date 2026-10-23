@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 type: software
-title: "QoraDFXM: QoraDFXM detector-image analysis engine with a CLI and a PySide6 GUI"
+title: "QoraDFXM: dark-field X-ray microscopy detector-image analysis engine with a CLI and a PySide6 GUI"
 authors:
   - family-names: Yong
     given-names: Isaac

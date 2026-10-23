@@ -15,7 +15,7 @@ src/qoradfxm/
     profile.py     ring_profile — brightness along the fitted ellipse vs. scale k
     dataset.py     QoraDFXMDataset — fluent immutable domain object
   cli/             ← Headless front-end. Imports Core; never imports Qt.
-    __init__.py    subcommands: fit / convert / info / gui, build_parser(), main()
+    __init__.py    subcommands: fit / ring / convert / info / gui, build_parser(), main()
     spec.py        recipe ⇄ argv translation (`--op sub_bg:/dark`), pure
     __main__.py    python -m qoradfxm.cli
   gui/             ← View only. Calls Core, reflects results. No pixel math.
@@ -35,8 +35,8 @@ has no Qt at all (Qt lives in the `gui` extra).
 
 | | install | entry point |
 |---|---|---|
-| headless / beamline / batch | `pip install qoradfxm` | `qoradfxm fit\|convert\|info` |
-| desktop | `pip install qoradfxm[gui]` | `qoradfxm gui`, `qoradfxm-gui`, `python -m qoradfxm.gui` |
+| headless / beamline / batch | `uv tool install "git+https://github.com/NaNIsaac/QoraDFXM"` | `qoradfxm fit\|ring\|convert\|info` |
+| desktop | `uv tool install "qoradfxm[gui] @ git+https://github.com/NaNIsaac/QoraDFXM"` | `qoradfxm gui`, `qoradfxm-gui`, `python -m qoradfxm.gui` |
 
 `qoradfxm gui` imports Qt lazily inside the command, so a Qt-less install still
 parses every other subcommand and fails with an install hint only if the GUI is
