@@ -4,13 +4,14 @@ from __future__ import annotations
 
 import json
 import logging
+import warnings
 from pathlib import Path
 from typing import ClassVar
 
 from PySide6 import QtCore, QtWidgets
 
 from ..core import io
-from ..core.results import MASTER_COLUMNS, ResultsFrame
+from ..core.results import MASTER_COLUMNS, ResultsFrame, UnknownColumnsWarning
 from .icons import AppIcons
 from .models import COLUMN_LABELS
 from .results_window import DropTableView, ResultsWindow
@@ -303,13 +304,27 @@ class ResultsTableMixin:
         if not path:
             return
         try:
-            self._master.set_results(ResultsFrame.from_csv(path))
+            with warnings.catch_warnings(record=True) as caught:
+                warnings.simplefilter("always")
+                frame = ResultsFrame.from_csv(path)
+            self._master.set_results(frame)
         except Exception as exc:
             self._status.showMessage(f"CSV 불러오기 실패: {exc}", 6000)
             return
         self._show_results_table()
         self._results_table.resizeColumnsToContents()
         self._log(f"CSV 불러옴: {path} ({self._master.rowCount()}행)")
+        ignored = [
+            c
+            for w in caught
+            if isinstance(w.message, UnknownColumnsWarning)
+            for c in w.message.columns
+        ]
+        if ignored:
+            self._log(f"무시한 열: {', '.join(ignored)}")
+            self._status.showMessage(
+                f"CSV 불러옴, 결과 열이 아니라 무시한 열: {', '.join(ignored)}", 8000
+            )
 
     def _del_selected_row(self) -> None:
         sel = self._results_table.selectionModel()

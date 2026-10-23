@@ -482,6 +482,24 @@ def test_arrow_keys_do_nothing_without_a_preview_tab(main_window, three_tifs, pu
     assert main_window._tabs.count() == 1
 
 
+# -------------------------------------------------------------- CSV import
+def test_csv_import_reports_the_columns_it_ignored(main_window, tmp_path, monkeypatch):
+    from PySide6 import QtWidgets
+
+    path = tmp_path / "extra.csv"
+    path.write_text("shot_id,center_x,note\nA,1.5,hand-picked\n", encoding="utf-8")
+    monkeypatch.setattr(
+        QtWidgets.QFileDialog,
+        "getOpenFileName",
+        staticmethod(lambda *a, **k: (str(path), "")),
+    )
+
+    main_window._import_csv()
+
+    assert main_window._master.rowCount() == 1
+    assert "note" in main_window._status.currentMessage()
+
+
 # ------------------------------------------------------------ dropped files
 def test_dropped_corrupt_h5_is_reported_not_added(main_window, tmp_path, ring_h5):
     bad = tmp_path / "broken.h5"
