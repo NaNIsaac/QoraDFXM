@@ -92,7 +92,7 @@ ignore = [
 "src/qoradfxm/gui/*" = ["BLE001", "S110"]
 "src/qoradfxm/gui/models.py" = ["BLE001", "B008"]  # B008: QModelIndex() default is Qt's own signature
 # Launching the OS file manager / the interpreter under test is the point.
-"src/qoradfxm/gui/main_window.py" = ["BLE001", "S110", "S603", "S607"]
+"src/qoradfxm/gui/file_dock.py" = ["BLE001", "S110", "S603", "S607"]
 "tests/*" = ["S101", "S603", "PLR2004"]
 
 [tool.pytest.ini_options]
