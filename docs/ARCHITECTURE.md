@@ -24,7 +24,17 @@ src/qoradfxm/
     ring_panel.py  링 프로파일 tab — live I(k) plot driven by the ellipse ROI
     models.py      MasterTableModel (QAbstractTableModel) over Core ResultsFrame
     image_view.py  dumb display of a processed ndarray
-    main_window.py orchestration; DocumentSession.ds holds a QoraDFXMDataset
+    document.py    DocumentSession — one open image; .ds holds a QoraDFXMDataset
+    prefs.py       ViewPrefs — per-document display state
+    main_window.py MainWindow, composed from the mixins below
+    documents.py   DocumentsMixin: tabs, file loading, fitting, cursor readout
+    pipeline.py    PipelineMixin: preprocessing chain, ROIs, the object tree
+    results_table.py  ResultsTableMixin: Master table, shot inspector
+    control_dock.py   ControlDockMixin: control and analysis docks, ring panel
+    file_dock.py   FileDockMixin: file explorer, filter, context menu
+    ribbon.py      RibbonMixin: ribbon, shortcuts, tab-bar commands
+    roi.py, results_window.py, settings_dialog.py, widgets.py, theme.py,
+    icons.py, constants.py   widgets, dialogs and styling used by the above
 ```
 
 Dependency direction: `core ← cli ← gui`. Nothing points back.
@@ -44,8 +54,9 @@ actually asked for.
 
 ## GUI → CLI
 
-Batch work started from the GUI goes out through the same command line a user
-could have typed, as a child process (`gui/cli_bridge.py`):
+Batch work started from the GUI is meant to go out through the same command
+line a user could have typed, as a child process (`gui/cli_bridge.py`). The
+plumbing is in place; no GUI action uses it yet (see Roadmap fit below):
 
 ```python
 from .cli_bridge import CliJob, argv_for_dataset
