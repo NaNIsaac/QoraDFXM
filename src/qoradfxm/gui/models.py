@@ -109,7 +109,7 @@ class MasterTableModel(QtCore.QAbstractTableModel):
             if col == "points_json" and role == QtCore.Qt.DisplayRole:
                 try:
                     return f"{len(json.loads(val))} pts"
-                except Exception:
+                except ValueError, TypeError:
                     return str(val)
             return str(val)
         return None

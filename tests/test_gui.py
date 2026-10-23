@@ -480,3 +480,21 @@ def test_arrow_keys_do_nothing_without_a_preview_tab(main_window, three_tifs, pu
     pump(400)
     assert main_window._cur().file_path == pinned
     assert main_window._tabs.count() == 1
+
+
+# ------------------------------------------------------------ dropped files
+def test_dropped_corrupt_h5_is_reported_not_added(main_window, tmp_path, ring_h5):
+    bad = tmp_path / "broken.h5"
+    bad.write_bytes(b"this is not an hdf5 file")
+
+    main_window._add_dropped_files([bad, ring_h5])
+
+    ids = [main_window._master.index_of(sid) for sid in ("broken", "shot")]
+    assert ids[0] is None
+    assert main_window._shot_map
+    assert "broken.h5" in main_window._status.currentMessage()
+
+
+def test_dropped_valid_h5_adds_a_row(main_window, ring_h5):
+    main_window._add_dropped_files([ring_h5])
+    assert main_window._master.rowCount() == 1
