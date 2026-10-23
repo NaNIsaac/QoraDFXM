@@ -45,6 +45,10 @@ Issues = "https://github.com/NaNIsaac/QoraDFXM/issues"
 requires = ["hatchling>=1.27"]
 build-backend = "hatchling.build"
 
+# Read by .github/tools/conventions.py: the reason this repo is not on uv_build.
+[tool.conventions]
+build-backend = "src/qoradfxm has no __init__.py (a namespace package) and uv_build refuses to build one; adding the file would change the wheel contents"
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/qoradfxm"]
 
