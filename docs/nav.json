@@ -1,0 +1,12 @@
+{
+  "sidebar": [
+    {
+      "text": "Getting Started",
+      "items": [{ "text": "Overview", "link": "index.md" }]
+    },
+    {
+      "text": "Design",
+      "items": [{ "text": "Architecture", "link": "ARCHITECTURE.md" }]
+    }
+  ]
+}
