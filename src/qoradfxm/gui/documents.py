@@ -254,8 +254,8 @@ class DocumentsMixin:
         if path.suffix.lower() == ".json":
             try:
                 text = json.dumps(json.loads(text), indent=2, ensure_ascii=False)
-            except Exception:
-                pass
+            except ValueError:
+                pass  # not valid JSON: show the raw text
         editor = QtWidgets.QPlainTextEdit()
         editor.setReadOnly(True)
         editor.setFont(QtGui.QFont("Consolas", 10))

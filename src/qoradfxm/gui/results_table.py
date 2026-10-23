@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from pathlib import Path
 from typing import ClassVar
 
@@ -13,6 +14,8 @@ from ..core.results import MASTER_COLUMNS, ResultsFrame
 from .icons import AppIcons
 from .models import COLUMN_LABELS
 from .results_window import DropTableView, ResultsWindow
+
+logger = logging.getLogger(__name__)
 
 
 class ResultsTableMixin:
@@ -237,6 +240,7 @@ class ResultsTableMixin:
     def _add_dropped_files(self, paths: list) -> None:
         """Files dragged onto the table → basic-info rows (filename/frames)."""
         added = 0
+        unreadable: list[str] = []
         for raw in paths:
             p = Path(raw)
             if p.is_dir() or p.suffix.lower() not in self._SUPPORTED:
@@ -245,8 +249,11 @@ class ResultsTableMixin:
                 # one row per detector frame in the h5
                 try:
                     frames = io.list_frames(p)
-                except Exception:
-                    frames = []
+                except OSError as exc:
+                    logger.warning("cannot read %s: %s", p, exc)
+                    self._log(f"드롭 실패: {p.name} — {exc}")
+                    unreadable.append(p.name)
+                    continue
                 if frames:
                     for f in frames:
                         sid = self._shot_id_for_frame(p, f)
@@ -263,7 +270,13 @@ class ResultsTableMixin:
                 added += 1
         self._results_table.resizeColumnsToContents()
         self._log(f"드롭 → {added}개 행 추가")
-        self._status.showMessage(f"드롭한 파일에서 {added}개 행 추가", 4000)
+        if unreadable:
+            self._status.showMessage(
+                f"읽을 수 없는 h5 {len(unreadable)}개 건너뜀: {', '.join(unreadable)}",
+                8000,
+            )
+        else:
+            self._status.showMessage(f"드롭한 파일에서 {added}개 행 추가", 4000)
 
     def _new_table_row(self) -> None:
         """Append a blank row for manual data entry (cells are editable)."""

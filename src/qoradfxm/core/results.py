@@ -8,6 +8,7 @@ The GUI's QTableView is a *view* onto it via a thin Qt adapter in
 from __future__ import annotations
 
 import json
+import warnings
 from dataclasses import dataclass, field
 
 import numpy as np
@@ -202,4 +203,16 @@ class ResultsFrame:
 
     @classmethod
     def from_csv(cls, path: str) -> ResultsFrame:
-        return cls(pd.read_csv(path))
+        df = pd.read_csv(path)
+        known = [c for c in df.columns if c in MASTER_COLUMNS]
+        if not known:
+            raise ValueError(
+                f"{path} has none of the results columns; found: {', '.join(map(str, df.columns))}"
+            )
+        unknown = [str(c) for c in df.columns if c not in MASTER_COLUMNS]
+        if unknown:
+            warnings.warn(
+                f"{path}: ignoring columns that are not results columns: {', '.join(unknown)}",
+                stacklevel=2,
+            )
+        return cls(df)
