@@ -148,8 +148,9 @@ def load_image_file(path: Path | str) -> np.ndarray:
             raise ValueError(f"Could not read image: {path}")
 
     img = np.asarray(img)
-    if img.ndim == 3:
-        # Drop alpha, average channels (cv2 is BGR but luminance-avg is fine).
+    if img.ndim == 3 and img.shape[-1] in (3, 4):
+        # Colour: drop alpha, average channels (cv2 is BGR but luminance-avg is fine).
+        # Any other 3-D shape, such as a multi-page TIFF stack, is refused below.
         img = img[..., :3].mean(axis=2)
     if img.ndim != 2:
         raise ValueError(f"Unsupported image shape {img.shape} in {path}")

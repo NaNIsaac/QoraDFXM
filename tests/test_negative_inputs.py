@@ -95,9 +95,6 @@ def test_unreadable_png_is_refused(tmp_path):
         io.load_image_file(bad)
 
 
-@pytest.mark.xfail(
-    strict=True, reason="QoraDFXM#16: a TIFF stack is read as a colour image"
-)
 def test_a_multi_page_tif_stack_is_not_taken_for_one_image(tmp_path):
     stack = tmp_path / "stack.tif"
     data = np.arange(5 * 40 * 60, dtype=np.float32).reshape(5, 40, 60)
@@ -107,11 +104,26 @@ def test_a_multi_page_tif_stack_is_not_taken_for_one_image(tmp_path):
 
 
 # ------------------------------------------------------------------------ CSV
-@pytest.mark.xfail(
-    strict=True, reason="QoraDFXM#15: from_csv drops unknown columns silently"
-)
 def test_csv_with_no_results_columns_is_refused(tmp_path):
     path = tmp_path / "other.csv"
     path.write_text("foo,bar\n1,2\n", encoding="utf-8")
     with pytest.raises(ValueError):
         ResultsFrame.from_csv(str(path))
+
+
+def test_csv_with_extra_columns_keeps_the_results_and_warns(tmp_path):
+    path = tmp_path / "extra.csv"
+    path.write_text("shot_id,center_x,note\nA,1.5,hand-picked\n", encoding="utf-8")
+    with pytest.warns(UserWarning, match="note"):
+        frame = ResultsFrame.from_csv(str(path))
+    assert frame.get_cell(0, "shot_id") == "A"
+    assert frame.get_cell(0, "center_x") == 1.5
+    assert "note" not in frame.df.columns
+
+
+def test_a_colour_tif_is_still_converted_to_gray(tmp_path):
+    path = tmp_path / "rgb.tif"
+    tifffile.imwrite(path, np.full((8, 9, 3), 30, dtype=np.uint8), photometric="rgb")
+    img = io.load_image_file(path)
+    assert img.shape == (8, 9)
+    assert float(img[0, 0]) == 30.0
