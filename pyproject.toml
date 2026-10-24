@@ -40,6 +40,7 @@ cuda = ["cupy-cuda13x[ctk]>=14.1.1"]
 Homepage = "https://github.com/NaNIsaac/QoraDFXM"
 Repository = "https://github.com/NaNIsaac/QoraDFXM"
 Issues = "https://github.com/NaNIsaac/QoraDFXM/issues"
+Changelog = "https://github.com/NaNIsaac/QoraDFXM/blob/main/CHANGELOG.md"
 
 [build-system]
 requires = ["hatchling>=1.27"]
