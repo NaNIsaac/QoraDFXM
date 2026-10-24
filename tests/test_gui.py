@@ -303,6 +303,21 @@ UNFILTERED = [
 FILTERED = ["shockwave_01.tif", "shockwave_02.tif", "sub"]
 
 
+def rows_sorted_by_name(main_window) -> bool:
+    """Whether QFileSystemModel has finished its delayed sort of the folder.
+
+    Rows first appear in directory order; a zero-delay timer then sorts them and
+    moves persistent indexes. Linux returns directory order unsorted, so an index
+    taken before the sort can end up on the last row (Windows and macOS list
+    alphabetically already).
+    """
+    model, root = main_window._fs_model, main_window._tree.rootIndex()
+    paths = [
+        model.filePath(model.index(r, 0, root)) for r in range(model.rowCount(root))
+    ]
+    return paths == sorted(paths)
+
+
 def listing_state(main_window) -> str:
     """What the explorer shows and why, for a failure message.
 
@@ -427,20 +442,19 @@ def test_arrow_keys_move_the_preview(main_window, three_tifs, pump, wait_until):
     model.setRootPath(str(folder))
     tree.setRootIndex(model.index(str(folder)))
     wait_until(
-        lambda: model.rowCount(tree.rootIndex()) >= len(three_tifs),
+        lambda: (
+            model.rowCount(tree.rootIndex()) >= len(three_tifs)
+            and rows_sorted_by_name(main_window)
+        ),
         lambda: listing_state(main_window),
     )
-    rows = [
-        model.index(r, 0, tree.rootIndex())
-        for r in range(model.rowCount(tree.rootIndex()))
-    ]
-    tifs = [i for i in rows if model.filePath(i).endswith(".tif")]
-    assert len(tifs) >= 2
+    start = model.index(str(three_tifs[0]))
 
-    tree.setCurrentIndex(tifs[0])
-    main_window._on_tree_preview(tifs[0])
+    tree.setCurrentIndex(start)
+    main_window._on_tree_preview(start)
     pump(200)
     first = main_window._cur().file_path
+    assert first == three_tifs[0]
 
     tree.setFocus()
     QtWidgets.QApplication.sendEvent(
@@ -467,7 +481,10 @@ def test_arrow_keys_do_nothing_without_a_preview_tab(
     model.setRootPath(str(folder))
     tree.setRootIndex(model.index(str(folder)))
     wait_until(
-        lambda: model.rowCount(tree.rootIndex()) >= len(three_tifs),
+        lambda: (
+            model.rowCount(tree.rootIndex()) >= len(three_tifs)
+            and rows_sorted_by_name(main_window)
+        ),
         lambda: listing_state(main_window),
     )
 
