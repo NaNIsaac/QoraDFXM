@@ -303,6 +303,21 @@ UNFILTERED = [
 FILTERED = ["shockwave_01.tif", "shockwave_02.tif", "sub"]
 
 
+def rows_sorted_by_name(main_window) -> bool:
+    """Whether QFileSystemModel has finished its delayed sort of the folder.
+
+    Rows first appear in directory order; a zero-delay timer then sorts them and
+    moves persistent indexes. Linux returns directory order unsorted, so an index
+    taken before the sort can end up on the last row (Windows and macOS list
+    alphabetically already).
+    """
+    model, root = main_window._fs_model, main_window._tree.rootIndex()
+    paths = [
+        model.filePath(model.index(r, 0, root)) for r in range(model.rowCount(root))
+    ]
+    return paths == sorted(paths)
+
+
 def listing_state(main_window) -> str:
     """What the explorer shows and why, for a failure message.
 
@@ -419,28 +434,27 @@ def test_diving_in_and_back_out_returns_where_you_were(main_window, tmp_path, pu
 
 
 # ------------------------------------------------ explorer arrow-key preview
-def test_arrow_keys_move_the_preview(main_window, three_tifs, pump):
+def test_arrow_keys_move_the_preview(main_window, three_tifs, pump, wait_until):
     from PySide6 import QtCore, QtGui, QtWidgets
 
     folder = three_tifs[0].parent
     tree, model = main_window._tree, main_window._fs_model
     model.setRootPath(str(folder))
     tree.setRootIndex(model.index(str(folder)))
-    for _ in range(20):  # QFileSystemModel populates asynchronously
-        pump(100)
-        if model.rowCount(tree.rootIndex()) >= len(three_tifs):
-            break
-    rows = [
-        model.index(r, 0, tree.rootIndex())
-        for r in range(model.rowCount(tree.rootIndex()))
-    ]
-    tifs = [i for i in rows if model.filePath(i).endswith(".tif")]
-    assert len(tifs) >= 2
+    wait_until(
+        lambda: (
+            model.rowCount(tree.rootIndex()) >= len(three_tifs)
+            and rows_sorted_by_name(main_window)
+        ),
+        lambda: listing_state(main_window),
+    )
+    start = model.index(str(three_tifs[0]))
 
-    tree.setCurrentIndex(tifs[0])
-    main_window._on_tree_preview(tifs[0])
+    tree.setCurrentIndex(start)
+    main_window._on_tree_preview(start)
     pump(200)
     first = main_window._cur().file_path
+    assert first == three_tifs[0]
 
     tree.setFocus()
     QtWidgets.QApplication.sendEvent(
@@ -449,23 +463,30 @@ def test_arrow_keys_move_the_preview(main_window, three_tifs, pump):
             QtCore.QEvent.KeyPress, QtCore.Qt.Key_Down, QtCore.Qt.NoModifier
         ),
     )
-    pump(400)
-    assert main_window._cur().file_path != first
+    wait_until(
+        lambda: main_window._cur().file_path != first,
+        lambda: f"still on {first}; {listing_state(main_window)}",
+    )
     assert main_window._cur().preview is True
     assert main_window._tabs.count() == 1, "navigation must not stack tabs"
 
 
-def test_arrow_keys_do_nothing_without_a_preview_tab(main_window, three_tifs, pump):
+def test_arrow_keys_do_nothing_without_a_preview_tab(
+    main_window, three_tifs, pump, wait_until
+):
     from PySide6 import QtCore, QtGui, QtWidgets
 
     folder = three_tifs[0].parent
     tree, model = main_window._tree, main_window._fs_model
     model.setRootPath(str(folder))
     tree.setRootIndex(model.index(str(folder)))
-    for _ in range(20):
-        pump(100)
-        if model.rowCount(tree.rootIndex()) >= len(three_tifs):
-            break
+    wait_until(
+        lambda: (
+            model.rowCount(tree.rootIndex()) >= len(three_tifs)
+            and rows_sorted_by_name(main_window)
+        ),
+        lambda: listing_state(main_window),
+    )
 
     main_window._open_document(three_tifs[0], preview=False)  # pinned
     pinned = main_window._cur().file_path
