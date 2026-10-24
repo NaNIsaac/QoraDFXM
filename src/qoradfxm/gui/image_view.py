@@ -161,7 +161,6 @@ class ImageView(QtWidgets.QWidget):
 
         self._build_ui()
 
-    # ------------------------------------------------------------------ UI
     def _build_ui(self) -> None:
         self._glw = pg.GraphicsLayoutWidget()
         self._glw.setBackground("#1a1a1a")
@@ -316,7 +315,6 @@ class ImageView(QtWidgets.QWidget):
         self._image_item.scene().sigMouseClicked.connect(self._on_mouse_clicked)
         self._vb.sigRangeChanged.connect(self._on_range_changed)
 
-    # -------------------------------------------------------------- loading
     def set_image(self, img: np.ndarray) -> None:
         """Load a new raw frame, resetting fit state and autoscaling levels."""
         self._hide_error()
@@ -335,7 +333,6 @@ class ImageView(QtWidgets.QWidget):
     def image_shape(self) -> tuple[int, int]:
         return (0, 0) if self._raw is None else self._raw.shape
 
-    # ----------------------------------------------------------- zoom/error
     def reset_zoom(self) -> None:
         """Fit the whole image (or error marker) back into the view."""
         self._vb.autoRange()
@@ -415,7 +412,6 @@ class ImageView(QtWidgets.QWidget):
         self._error_curve.setVisible(False)
         self._error_text.setVisible(False)
 
-    # ------------------------------------------------------------- scale bar
     def set_scale(self, px_size: float, unit: str) -> None:
         """Calibrate: each pixel spans ``px_size`` of the given real unit."""
         self._px_size = float(px_size) if px_size > 0 else 1.0
@@ -521,7 +517,6 @@ class ImageView(QtWidgets.QWidget):
         if self._image_item.qimage is None or not self._image_item.qimage.save(path):
             raise OSError("이미지 렌더 저장 실패")
 
-    # ------------------------------------------------------- histogram panel
     def histogram_visible(self) -> bool:
         return self._hist_visible
 
@@ -608,7 +603,6 @@ class ImageView(QtWidgets.QWidget):
         rgba[mask] = (*self._overmax_color, 255)
         self._overlay_item.setImage(rgba, autoLevels=False)
 
-    # --------------------------------------------------------------- cursor
     def _on_mouse_moved(self, scene_pos) -> None:
         if self._raw is None:
             return
@@ -626,7 +620,6 @@ class ImageView(QtWidgets.QWidget):
             x0, y0 = self._line_pending
             self._line_preview.setData([x0, x], [y0, y])
 
-    # ---- region rubber-band (rect tool) ----
     def _on_rect_draw_start(self, p0) -> None:
         self._rect_preview.setVisible(True)
 
@@ -639,7 +632,6 @@ class ImageView(QtWidgets.QWidget):
         if abs(p1.x() - p0.x()) > 2 and abs(p1.y() - p0.y()) > 2:
             self.rectDrawn.emit(p0.x(), p0.y(), p1.x(), p1.y())
 
-    # -------------------------------------------------------------- tools
     def set_tool(self, name: str) -> None:
         """Switch the active interaction tool (state machine)."""
         if name not in self.TOOLS:
@@ -735,7 +727,6 @@ class ImageView(QtWidgets.QWidget):
         self._major_axis.setData([], [])
         self._minor_axis.setData([], [])
 
-    # -------------------------------------------------------- ROI objects (B)
     def add_roi_item(self, roi) -> None:
         """Draw a managed ROI on the canvas and emit signals on edits."""
         roi.setZValue(25)
@@ -779,7 +770,6 @@ class ImageView(QtWidgets.QWidget):
     def selected_roi(self):
         return self._selected_roi
 
-    # ---- active line binding: the bottom profile follows this line ROI ----
     def set_active_line(self, roi) -> None:
         if self._active_line is roi:
             self._emit_active_profile()
@@ -812,7 +802,6 @@ class ImageView(QtWidgets.QWidget):
         )
         self.lineProfileChanged.emit(axis, vals, unit)
 
-    # ---------------------------------------------------------- distance tool
     def _redraw_distance(self) -> None:
         for t in self._dist_labels:
             self._vb.removeItem(t)

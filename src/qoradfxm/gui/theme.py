@@ -178,7 +178,7 @@ def build_style(theme: str) -> str:
     for k, v in toks.items():
         s = s.replace("%" + k + "%", v)
 
-    # qtawesome 체크마크 아이콘을 임시 PNG로 저장하여 QSS에 주입
+    # QSS can only reference a file, so write the check-mark icon to a temp PNG
     check_pix = AppIcons.get_pixmap(AppIcons.CHECK, size=12, color="#ffffff")
     tmp_check_path = Path(tempfile.gettempdir()) / "qoradfxm_qta_check.png"
     check_pix.save(str(tmp_check_path))

@@ -18,7 +18,6 @@ from .widgets import CollapsibleSection
 class ControlDockMixin:
     """Control dock, analysis dock and the ring profile panel."""
 
-    # ------------------------------------------------------ control dock
     def _build_control_dock(self) -> None:
         dock = self._control_dock = QtWidgets.QDockWidget("컨트롤", self)
         dock.setObjectName("ControlDock")
@@ -139,7 +138,6 @@ class ControlDockMixin:
         dock.setMinimumWidth(330)
         self.addDockWidget(QtCore.Qt.RightDockWidgetArea, dock)
 
-    # ----- overmax color -----
     def _update_overmax_btn_style(self) -> None:
         self._overmax_color_btn.setStyleSheet(
             f"background-color: {self._overmax_color.name()}; border: 1px solid #555; border-radius: 3px;"
@@ -157,7 +155,6 @@ class ControlDockMixin:
                 v.set_overmax_color(color)
                 self._log(f"Over-max highlight color: {color.name()}")
 
-    # ----- tool pages -----
     def _build_view_page(self) -> QtWidgets.QWidget:
         w = QtWidgets.QWidget()
         lay = QtWidgets.QVBoxLayout(w)
@@ -253,7 +250,6 @@ class ControlDockMixin:
         fl.addWidget(self._results, 1)
         return w
 
-    # ----------------------------------------------------- analysis dock
     def _build_analysis_dock(self) -> None:
         self._analysis_dock = QtWidgets.QDockWidget("분석 / 로그", self)
         self._analysis_dock.setObjectName("AnalysisDock")
@@ -278,11 +274,11 @@ class ControlDockMixin:
         )
         tabs.addTab(self._profile_plot, "라인 프로파일")
 
-        # 링 프로파일: 타원 둘레 밝기 I(k). Core measures, this only draws.
+        # Core measures the ring profile I(k); this only draws it.
         self._ring_panel = RingProfilePanel(source=self._ring_source)
         tabs.addTab(self._ring_panel, "링 프로파일")
 
-        # 결과 표 lives in its own resizable window (see _show_results_table),
+        # The results table lives in its own resizable window (see _show_results_table),
         # not this cramped bottom dock. Build the table widget here though.
         self._build_results_table_widget()
 
@@ -296,7 +292,6 @@ class ControlDockMixin:
         self.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self._analysis_dock)
         self._analysis_dock.hide()
 
-    # ------------------------------------------------------- 링 프로파일
     def _linear_image(self, doc):
         """Current image with the nonlinear display ops stripped (cached).
 

@@ -38,7 +38,6 @@ from .spec import OP_ARG_HELP, SpecError, parse_ops
 __all__ = ["build_parser", "main"]
 
 
-# --------------------------------------------------------------- helpers
 def _load_dataset(path: Path, dataset_path: str | None) -> QoraDFXMDataset:
     if dataset_path:
         return QoraDFXMDataset.from_h5(path, dataset_path)
@@ -53,7 +52,6 @@ def _apply_ops(ds: QoraDFXMDataset, op_specs) -> QoraDFXMDataset:
     return ds
 
 
-# -------------------------------------------------------------- commands
 def cmd_fit(args) -> int:
     ds = _load_dataset(Path(args.file), args.dataset)
     ds = _apply_ops(ds, args.op)
@@ -220,7 +218,6 @@ def cmd_gui(args) -> int:
         return 1
 
 
-# ---------------------------------------------------------------- parser
 def _version() -> str:
     from importlib.metadata import PackageNotFoundError, version
 

@@ -34,7 +34,6 @@ class DocumentSession:
         ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.logs.append(f"[{ts}] {message}")
 
-    # --- ROI management ----------------------------------------------------
     def add_roi(self, roi) -> None:
         self.roi_objects[roi.roi_id] = roi
 

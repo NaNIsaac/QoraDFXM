@@ -1,4 +1,4 @@
-"""링 프로파일 패널 — 타원 둘레 밝기 I(k) 실시간 플롯.
+"""Ring profile panel: live plot of the brightness I(k) around the ellipse.
 
 The panel owns no pixel math: it asks its *source* callback for the current
 (linear) image plus the live ellipse geometry, hands both to
@@ -37,7 +37,6 @@ class RingProfilePanel(QtWidgets.QWidget):
 
         self._build_ui()
 
-    # ------------------------------------------------------------------ ui
     def _build_ui(self) -> None:
         lay = QtWidgets.QVBoxLayout(self)
         lay.setContentsMargins(6, 6, 6, 6)
@@ -126,13 +125,12 @@ class RingProfilePanel(QtWidgets.QWidget):
         w.setMaximumWidth(90)
         return w
 
-    # --------------------------------------------------------------- logic
     def set_source(self, source) -> None:
         """``source() -> (image, geom) | None`` — linear image + live ellipse."""
         self._source = source
 
     def request_update(self) -> None:
-        """Coalesced refresh; ignored while 실시간 is off (buttons still work)."""
+        """Coalesced refresh; ignored while the live checkbox is off (buttons still work)."""
         if self._live.isChecked() and self.isVisible():
             self._timer.start()
 

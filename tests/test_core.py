@@ -18,7 +18,6 @@ def img():
     return np.arange(60, dtype=np.float32).reshape(6, 10)
 
 
-# ------------------------------------------------------------------ warp
 def test_scale_changes_each_axis_independently(img):
     assert warp.scale(img, 2.0, 0.5).shape == (3, 20)
     assert warp.scale(img, 1.5).shape == (9, 15)  # sy defaults to sx
@@ -68,7 +67,6 @@ def test_rotate_fill_value_lands_in_the_corners(img):
     assert out[0, 0] == pytest.approx(-1.0)
 
 
-# --------------------------------------------------------------- recipe
 def test_dataset_ops_are_immutable_and_ordered(img):
     ds = QoraDFXMDataset.from_array(img)
     grown = ds.scale(2.0, 0.5).rotate(15).flip("v")
@@ -105,7 +103,6 @@ def test_replace_history_recomputes_the_image(img):
     assert plain.image.shape == img.shape
 
 
-# ------------------------------------------------------- linear_view
 def test_linear_view_drops_only_the_nonlinear_ops(img):
     ds = QoraDFXMDataset.from_array(img).scale(2.0).apply_log().gamma(0.5).normalize()
     kinds = [op.kind for op in ds.linear_view().history]
@@ -123,7 +120,6 @@ def test_ring_profile_requires_a_fit(img):
         QoraDFXMDataset.from_array(img).ring_profile()
 
 
-# ----------------------------------------------------------- transform
 def test_adaptive_log_survives_nan_corners():
     a = np.array([[1.0, 2.0], [np.nan, 4.0]], dtype=np.float32)
     out = adaptive_log(a)
@@ -136,7 +132,6 @@ def test_adaptive_log_of_all_nan_does_not_raise():
     assert np.isnan(out).all()
 
 
-# ------------------------------------------------------- dark / flat refs
 def test_sub_bg_without_a_reference_is_refused(img):
     ds = QoraDFXMDataset.from_array(img)
     with pytest.raises(CorrectionError, match=r"dataset_path=\.\.\. or file_path="):

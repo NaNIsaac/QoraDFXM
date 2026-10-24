@@ -91,7 +91,6 @@ def points_json(tmp_path):
     return path
 
 
-# ------------------------------------------------------------------ Qt
 @pytest.fixture(scope="session", autouse=True)
 def isolated_qsettings(tmp_path_factory):
     """Redirect QSettings to a temp dir — tests must not touch the real app state."""

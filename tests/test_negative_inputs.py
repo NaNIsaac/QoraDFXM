@@ -12,7 +12,6 @@ from qoradfxm.core import fitting, io
 from qoradfxm.core.results import FitResult, ResultsFrame, UnknownColumnsWarning
 
 
-# ------------------------------------------------------------------ ellipse fit
 def test_fewer_than_five_points_are_refused():
     with pytest.raises(ValueError, match="at least 5"):
         FitResult.from_points([[0, 0], [1, 0], [0, 1], [1, 1]])
@@ -56,7 +55,6 @@ def test_a_non_elliptical_conic_is_refused():
         fitting.conic_to_geometry(hyperbola)
 
 
-# ----------------------------------------------------------------------- h5 / images
 def test_unreadable_h5_raises_oserror(tmp_path):
     bad = tmp_path / "broken.h5"
     bad.write_bytes(b"not hdf5")
@@ -103,7 +101,6 @@ def test_a_multi_page_tif_stack_is_not_taken_for_one_image(tmp_path):
         io.load_image_file(stack)
 
 
-# ------------------------------------------------------------------------ CSV
 def test_csv_with_no_results_columns_is_refused(tmp_path):
     path = tmp_path / "other.csv"
     path.write_text("foo,bar\n1,2\n", encoding="utf-8")

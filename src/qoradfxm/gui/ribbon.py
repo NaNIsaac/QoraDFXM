@@ -14,7 +14,6 @@ from .image_view import COLORMAPS
 class RibbonMixin:
     """Ribbon UI, keyboard shortcuts and the tab bar commands."""
 
-    # ============================================================ ribbon UI
     def _act(self, text: str, slot, tip: str = "", checkable: bool = False):
         a = QtGui.QAction(text, self, checkable=checkable)
         if tip:
@@ -169,7 +168,6 @@ class RibbonMixin:
         self._cmap_syncing = False
         self._ribbon_cmap.currentTextChanged.connect(self._on_ribbon_cmap)
 
-        # --- Ribbon tabs ---
         ribbon = QtWidgets.QTabWidget()
         ribbon.setObjectName("Ribbon")
         ribbon.setFixedHeight(140)
@@ -433,7 +431,6 @@ class RibbonMixin:
         else:
             self._analysis_dock.hide()
 
-    # ------------------------------------------------------- 단축키 / 탭
     #: (key sequence, handler name, what it does) — also the help table's source.
     SHORTCUTS: ClassVar[tuple[tuple[str, str, str], ...]] = (
         ("Ctrl+O", "_open_file", "파일 열기"),

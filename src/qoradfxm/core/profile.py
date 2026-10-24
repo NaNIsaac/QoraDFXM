@@ -114,7 +114,6 @@ class RingProfile:
     def to_csv(self, path) -> None:
         self.to_dataframe().to_csv(path, index=False, encoding="utf-8-sig")
 
-    # ------------------------------------------------------------- summary
     def peak(self) -> tuple[float, float]:
         """(k, intensity) at the maximum, parabola-refined between samples."""
         y = self.mean

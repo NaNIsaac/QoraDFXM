@@ -18,7 +18,6 @@ from qoradfxm.cli.spec import (
 from qoradfxm.core import QoraDFXMDataset
 
 
-# ------------------------------------------------------------- grammar
 @pytest.mark.parametrize(
     "spec",
     [
@@ -97,7 +96,6 @@ def test_argv_needs_a_source_path():
         argv_for_dataset(QoraDFXMDataset.from_array(np.ones((2, 2), np.float32)))
 
 
-# ------------------------------------------------------------ commands
 def test_info_lists_frames_and_shapes(ring_h5, capsys):
     assert main(["info", str(ring_h5)]) == 0
     out = capsys.readouterr().out
