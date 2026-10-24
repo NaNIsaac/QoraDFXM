@@ -22,7 +22,6 @@ logger = logging.getLogger(__name__)
 class ResultsTableMixin:
     """Results table, shot inspector and ribbon-driven data table."""
 
-    # ----------------------------------------------------- results table
     def _build_results_table_widget(self) -> None:
         """The QTableView itself (hosted later by the standalone ResultsWindow)."""
         self._results_table = DropTableView()
@@ -40,7 +39,6 @@ class ResultsTableMixin:
         self._results_table.filesDropped.connect(self._add_dropped_files)
         self._results_window = None
 
-    # ------------------------------------------------- Phase 2: shot ↔ row
     def _shot_id_for_frame(self, path: Path, frame) -> str:
         return f"{Path(path).stem}:{frame}"
 
@@ -103,7 +101,6 @@ class ResultsTableMixin:
         self._master.set_status(r, new)
         self._log(f"상태 변경: 행 {r + 1} → {new}")
 
-    # ------------------------------------------- shot inspector (sidebar)
     _INSP_HINT_COLS: ClassVar[set[str]] = {
         "center_x",
         "center_y",
@@ -218,7 +215,6 @@ class ResultsTableMixin:
         self._results_table.selectRow(r)
         self._log(f"샷 정보 → 표 {'추가' if created else '갱신'}: 행 {r + 1}")
 
-    # ------------------------------------------- data table (ribbon-driven)
     def _show_results_table(self) -> None:
         """Open the standalone, resizable results-table window (lazy)."""
         if self._results_window is None:

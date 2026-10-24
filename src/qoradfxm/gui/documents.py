@@ -17,7 +17,6 @@ from .prefs import ViewPrefs
 class DocumentsMixin:
     """Document and tab system, file logic, fit logic and cursor readout."""
 
-    # =================================================== document / tab system
     def _make_image_view(self) -> ImageView:
         v = ImageView()
         v.cursorMoved.connect(self._on_cursor)
@@ -404,7 +403,6 @@ class DocumentsMixin:
         if text.startswith("ELLIPSE FIT RESULT"):
             self._log("타원 피팅 완료")
 
-    # -------------------------------------------------------- file logic
     def _dialog_start_dir(self) -> str:
         start = self._settings.value("last_dir", "", type=str)
         if not start or not Path(start).is_dir():
@@ -591,7 +589,6 @@ class DocumentsMixin:
         self._info_label.setText(doc.info)
         self._results.clear()
 
-    # --------------------------------------------------------- fit logic
     def _on_clear_fit(self) -> None:
         if v := self._cur_view():
             v.clear_fit()
@@ -629,7 +626,6 @@ class DocumentsMixin:
             p.write_text(json.dumps(payload, indent=2), encoding="utf-8")
         self._status.showMessage(f"저장됨: {p}", 4000)
 
-    # ------------------------------------------------------------ cursor
     def _on_cursor(self, x: float, y: float, val: float) -> None:
         if np.isnan(val):
             self._pos_label.setText(f"커서:  x={x:.1f}  y={y:.1f}  (범위 밖)")

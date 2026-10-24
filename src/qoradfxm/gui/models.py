@@ -46,7 +46,6 @@ class MasterTableModel(QtCore.QAbstractTableModel):
         super().__init__(parent)
         self._results = results or ResultsFrame()
 
-    # --- Core access -------------------------------------------------------
     @property
     def results(self) -> ResultsFrame:
         return self._results
@@ -60,7 +59,6 @@ class MasterTableModel(QtCore.QAbstractTableModel):
         self._results = results
         self.endResetModel()
 
-    # --- Qt interface ------------------------------------------------------
     def rowCount(self, parent=QtCore.QModelIndex()) -> int:
         return 0 if parent.isValid() else len(self._results)
 
@@ -114,7 +112,6 @@ class MasterTableModel(QtCore.QAbstractTableModel):
             return str(val)
         return None
 
-    # --- editing (manual data cleanup) -------------------------------------
     def flags(self, index):
         if not index.isValid():
             return QtCore.Qt.NoItemFlags
@@ -145,7 +142,6 @@ class MasterTableModel(QtCore.QAbstractTableModel):
     def data_for_edit(self, index):
         return self._results.df.iat[index.row(), index.column()]
 
-    # --- mutation (wraps Core, emits Qt signals) ---------------------------
     def add_row(self, row: dict) -> int:
         r = len(self._results)
         self.beginInsertRows(QtCore.QModelIndex(), r, r)

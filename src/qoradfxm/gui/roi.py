@@ -44,7 +44,6 @@ class AnalysisROI:
         # Keep internal geometry current while the user drags the ROI.
         self.sigRegionChanged.connect(self._on_region_changed)
 
-    # --- visibility / lock -------------------------------------------------
     @property
     def visible(self) -> bool:
         return self._visible
@@ -67,7 +66,6 @@ class AnalysisROI:
             h.setVisible(not on)
         self.update()
 
-    # --- data ---------------------------------------------------------------
     def _on_region_changed(self, *_) -> None:
         self.update_data()
 

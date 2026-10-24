@@ -132,7 +132,6 @@ class MainWindow(
         self._restore_layout()
         self._restore_session()
 
-    # --------------------------------------------------- window lifecycle
     def _restore_layout(self) -> None:
         """Come back the size you left, with the docks where you put them."""
         geom = self._settings.value("win_geometry")
@@ -151,7 +150,6 @@ class MainWindow(
         doc = self._cur()
         self.setWindowTitle(f"{doc.file_path.name} — {APP_NAME}" if doc else APP_NAME)
 
-    # ------------------------------------------------------ drag & drop
     def _new_doc_prefs(self) -> ViewPrefs:
         """What a newly opened document starts with: the app-scoped defaults."""
         return self._app_prefs.copy(tool=getattr(self, "_current_tool", "select"))
@@ -223,7 +221,6 @@ class MainWindow(
         self._cmap_combo.setCurrentText(vals["def_cmap"])
         self._status.showMessage("설정 저장됨.", 3000)
 
-    # ------------------------------------------------ active-document access
     def _cur(self) -> DocumentSession | None:
         return self._docs.get(self._tabs.currentWidget())
 
@@ -232,8 +229,6 @@ class MainWindow(
         if doc and doc.kind == "image":
             return doc.view
         return None
-
-    # ---------------------------------------------------------- theme + icons
 
     def _set_action_icon(self, action: QtGui.QAction, icon_name: str) -> None:
         self._icon_actions[action] = icon_name
@@ -244,7 +239,6 @@ class MainWindow(
         self._icon_color = "#d4d4d8" if theme == "Dark" else "#33333a"
         self.setStyleSheet(build_style(theme))
 
-        # 등록된 Action 및 Button들 테마 색상 재적용
         for act, name in self._icon_actions.items():
             act.setIcon(AppIcons.get(name, self._icon_color))
         for btn, name in self._icon_buttons.items():
@@ -285,7 +279,6 @@ class MainWindow(
         self._log(f"Log scale {'ON' if b else 'OFF'}")
         self._after_preproc_change(doc)
 
-    # ------------------------------------------------------ session restore
     def _restore_session(self) -> None:
         """Reopen at the previously used folder / file."""
         last_dir = self._settings.value("last_dir", "", type=str)

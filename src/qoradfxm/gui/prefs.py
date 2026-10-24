@@ -45,7 +45,6 @@ class ViewPrefs:
     unit: str = "µm"
     tool: str = "select"
 
-    # --------------------------------------------------------- persistence
     @classmethod
     def load(cls, settings) -> ViewPrefs:
         """Read the app-scoped defaults (``tool`` is deliberately not stored)."""
@@ -65,7 +64,6 @@ class ViewPrefs:
         for field_name, key in _SETTINGS_KEYS.items():
             settings.setValue(key, getattr(self, field_name))
 
-    # ---------------------------------------------------------------- use
     def copy(self, **changes) -> ViewPrefs:
         """A new instance — documents must never share one prefs object."""
         return replace(self, **changes)

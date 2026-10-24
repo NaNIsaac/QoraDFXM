@@ -57,10 +57,9 @@ def wordmark_pixmap(height: int = 72, on_dark: bool = True) -> QtGui.QPixmap:
 
 
 class AppIcons:
-    # 검증된 QtAwesome 아이콘 키값들
     HAND = "fa5s.hand-paper"
     FOLDER = "ph.folder-open-bold"
-    CAMERA = "fa5s.camera"  # <--- 'msc.camera' 수정!
+    CAMERA = "fa5s.camera"
     DEFAULT_ZOOM = "fa5s.expand-arrows-alt"
     PAN = "fa5s.hand-paper"
     ZOOM_IN = "fa5s.search-plus"
@@ -86,6 +85,6 @@ class AppIcons:
     def get_pixmap(
         name_or_qta: str, size: int = 14, color: str = "#ffffff"
     ) -> QtGui.QPixmap:
-        """QSS 또는 QPainter용 Pixmap 반환"""
+        """Pixmap of the icon, for QSS or QPainter."""
         icon = AppIcons.get(name_or_qta, color=color)
         return icon.pixmap(size, size)

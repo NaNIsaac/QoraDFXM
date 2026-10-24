@@ -13,10 +13,8 @@ from .roi import EllipseFitROI, LineProfileROI, RectRegionROI
 class PipelineMixin:
     """Preprocessing chain, ROI handling and the pipeline object tree."""
 
-    # ------------------------------------------------- preprocessing chain
-    # The recipe is Core state: doc.ds.history (immutable). It is shown / managed
-    # in the sidebar's 오브젝트 tab (each image root gets a ⚙ 전처리 group).
-    # Dark/Flat sources are chosen from the sidebar (구조/파일 tab context menu).
+    # The recipe is Core state: doc.ds.history (immutable). The sidebar object tree
+    # shows and edits it; Dark/Flat sources come from the file tree's context menu.
     # The GUI performs NO pixel math — Core computes doc.ds.image.
 
     def _cur_preproc(self):
@@ -143,7 +141,7 @@ class PipelineMixin:
             rec = doc.ds.to_record()
             # If this shot ALREADY has a row (from populate/drop), update it in
             # place (Phase 2). Otherwise DON'T auto-add — the user picks fields
-            # in the 샷 정보 inspector and commits one row deliberately.
+            # in the shot inspector and commits one row deliberately.
             prev = self._master.index_of(rec["shot_id"])
             if prev is not None:
                 if str(self._master.status_at(prev)) == "EXCLUDE":
@@ -160,7 +158,6 @@ class PipelineMixin:
         name = self._next_roi_name(doc, "ellipse", "Ellipse")
         self.add_roi(EllipseFitROI(geom, points=pts, name=name))
 
-    # ------------------------------------------------------------- ROI (B-1)
     @staticmethod
     def _next_roi_name(doc: DocumentSession, roi_type: str, prefix: str) -> str:
         return f"{prefix}_{len(doc.rois_of_type(roi_type)) + 1}"
@@ -234,7 +231,6 @@ class PipelineMixin:
         self.add_roi(roi)
         v.select_roi(roi)
 
-    # =============================================== Pipeline object tree (B-3)
     def _build_object_tree(self) -> QtWidgets.QTreeWidget:
         self._obj_updating = False
         self._roi_items: dict[str, QtWidgets.QTreeWidgetItem] = {}
@@ -435,7 +431,7 @@ class PipelineMixin:
             self._preproc_add(doc, "gamma", {"gamma": float(g)})
 
     def _add_scale(self, doc) -> None:
-        """비율/크기 변형 — 가로·세로 배율을 따로 받는다 (같게 주면 단순 확대·축소)."""
+        """Ask for separate x and y scale factors (equal values scale uniformly)."""
         sx, ok = QtWidgets.QInputDialog.getDouble(
             self, "크기·비율 변형", "가로 배율 sx (1.0 = 그대로):", 1.0, 0.01, 20.0, 3
         )
@@ -463,7 +459,7 @@ class PipelineMixin:
         if doc is None:
             return
         menu = QtWidgets.QMenu(self)
-        if idx == -1:  # ⚙ 전처리 group node
+        if idx == -1:  # preprocessing group node
             menu.addAction("Log (adaptive) 추가", lambda: self._preproc_add(doc, "log"))
             menu.addAction(
                 "Log (pure) 추가", lambda: self._preproc_add(doc, "pure_log")

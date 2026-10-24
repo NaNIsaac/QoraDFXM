@@ -52,7 +52,6 @@ class QoraDFXMDataset:
     # memoized processed image; excluded from equality, reset by _with()
     _cache: np.ndarray | None = field(default=None, repr=False, compare=False)
 
-    # ------------------------------------------------------ constructors
     @classmethod
     def from_array(cls, arr, source_path=None, meta=None) -> QoraDFXMDataset:
         return cls(
@@ -83,7 +82,6 @@ class QoraDFXMDataset:
         arr = _io.load_image_file(path)
         return cls.from_array(arr, source_path=path, meta={"shot_id": path.stem})
 
-    # ------------------------------------------------------ fluent core
     def _with(self, **kw) -> QoraDFXMDataset:
         """Return a copy with the processed-image cache invalidated."""
         return replace(self, _cache=None, **kw)
@@ -114,7 +112,6 @@ class QoraDFXMDataset:
     def normalize(self) -> QoraDFXMDataset:
         return self._add_op("normalize")
 
-    # -------------------------------------------------- geometric (warp)
     # These change the image SHAPE, so anything picked on the old grid (fit
     # points, ROIs) no longer lines up — apply them before fitting.
     def scale(
@@ -141,7 +138,6 @@ class QoraDFXMDataset:
         """Fit an ellipse to picked points (on the PROCESSED image)."""
         return self._with(fit=FitResult.from_points(points))
 
-    # ------------------------------------------------------ measurements
     def linear_view(self) -> QoraDFXMDataset:
         """Same recipe with the intensity-bending ops (log/sqrt/gamma) dropped.
 
@@ -163,7 +159,6 @@ class QoraDFXMDataset:
             raise ValueError("no ellipse fit on this dataset — fit first")
         return _ring_profile(self.linear_view().image, self.fit, **kw)
 
-    # ------------------------------------------------------ history ops
     def undo(self) -> QoraDFXMDataset:
         return self._with(history=self.history.pop())
 
@@ -176,7 +171,6 @@ class QoraDFXMDataset:
             self.raw, source_path=self.source_path, meta=dict(self.meta)
         )._with(history=history)
 
-    # ------------------------------------------------------ derived data
     @property
     def image(self) -> np.ndarray:
         """raw with the full history applied, in order (memoized)."""
@@ -198,7 +192,6 @@ class QoraDFXMDataset:
     def log_scale(self) -> bool:
         return any(op.kind in ("log", "pure_log") for op in self.history)
 
-    # ------------------------------------------------------ export
     def to_record(self, status: str = "OK") -> dict | None:
         """One Master-table row, or None if not yet fitted."""
         if self.fit is None:

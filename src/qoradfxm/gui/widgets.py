@@ -49,26 +49,21 @@ class DropOverlay(QtWidgets.QWidget):
         self.setAttribute(QtCore.Qt.WA_StyledBackground, True)
         self.setStyleSheet("background: rgba(0,0,0,0.65);")
 
-        # 1. 중앙 박스 (테두리 및 배경 카드 역할)
         self._card = QtWidgets.QFrame()
         self._card.setObjectName("DropCard")
 
-        # 2. 아이콘 표시용 QLabel
         self._icon_label = QtWidgets.QLabel()
         self._icon_label.setAlignment(QtCore.Qt.AlignCenter)
 
-        # 3. 텍스트 표시용 QLabel
         self._text_label = QtWidgets.QLabel()
         self._text_label.setAlignment(QtCore.Qt.AlignCenter)
 
-        # 카드 내부 레이아웃
         card_lay = QtWidgets.QVBoxLayout(self._card)
         card_lay.setContentsMargins(60, 40, 60, 40)
         card_lay.setSpacing(16)
         card_lay.addWidget(self._icon_label, 0, QtCore.Qt.AlignCenter)
         card_lay.addWidget(self._text_label, 0, QtCore.Qt.AlignCenter)
 
-        # 전체 오버레이 레이아웃
         lay = QtWidgets.QVBoxLayout(self)
         lay.addStretch(1)
         lay.addWidget(self._card, 0, QtCore.Qt.AlignCenter)
@@ -78,12 +73,10 @@ class DropOverlay(QtWidgets.QWidget):
     def set_ok(self, ok: bool) -> None:
         color_hex = "#4da3ff" if ok else "#ff5252"
 
-        # 1. 아이콘 변경 (QtAwesome 픽스맵)
         icon_key = AppIcons.DOWNLOAD if ok else AppIcons.WARNING
         pixmap = AppIcons.get_pixmap(icon_key, size=56, color=color_hex)
         self._icon_label.setPixmap(pixmap)
 
-        # 2. 텍스트 변경
         if ok:
             text = (
                 "<span style='font-size: 15pt; font-weight: bold; color: #ffffff;'>"
@@ -98,7 +91,6 @@ class DropOverlay(QtWidgets.QWidget):
             )
         self._text_label.setText(text)
 
-        # 3. 카드 테두리 스타일 적용 (상황에 맞게 색상 동적 변경)
         self._card.setStyleSheet(f"""
             QFrame#DropCard {{
                 border: 2px dashed {color_hex};

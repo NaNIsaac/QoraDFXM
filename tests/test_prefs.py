@@ -83,7 +83,6 @@ def test_tool_is_not_persisted(qapp, tmp_path):
     assert ViewPrefs.load(settings).tool == "select"
 
 
-# ------------------------------------------------------- window semantics
 @pytest.fixture
 def two_tifs(tmp_path):
     paths = []

@@ -14,7 +14,6 @@ from .widgets import FilterEdit
 class FileDockMixin:
     """File explorer dock: tree, name filter and context menu."""
 
-    # --------------------------------------------------------- file dock
     def _build_file_dock(self) -> None:
         dock = self._file_dock = QtWidgets.QDockWidget("탐색기 (Explorer)", self)
         dock.setObjectName("FileDock")
@@ -39,7 +38,8 @@ class FileDockMixin:
         self._tree.setDragDropMode(QtWidgets.QAbstractItemView.DragOnly)
         self._tree.clicked.connect(self._on_tree_preview)
         self._tree.doubleClicked.connect(self._on_tree_open)
-        self._tree.activated.connect(self._on_tree_open)  # Enter = 확정 열기
+        # Enter opens for good; a click only previews.
+        self._tree.activated.connect(self._on_tree_open)
         # Arrow keys move the preview with the selection (VS Code style), but
         # only while something IS previewing — see _on_tree_current_changed.
         self._preview_timer = QtCore.QTimer(self)
@@ -178,7 +178,6 @@ class FileDockMixin:
         for i in reversed(range(self._tabs.count())):
             self._on_tab_close(i)
 
-    # ------------------------------------------------------- 이름 필터
     def _focus_filter(self) -> None:
         self._file_dock.show()
         self._filter_edit.setFocus(QtCore.Qt.ShortcutFocusReason)
@@ -248,7 +247,6 @@ class FileDockMixin:
 
         self._fs_model.directoryLoaded.connect(on_loaded)
 
-    # -------------------------------------------------- 파일 트리 컨텍스트 메뉴
     def _on_tree_context_menu(self, pos: QtCore.QPoint) -> None:
         index = self._tree.indexAt(pos)
         if not index.isValid():
@@ -259,13 +257,12 @@ class FileDockMixin:
 
         menu = QtWidgets.QMenu(self)
 
-        # 1. 파일 열기 (파일일 경우만)
         if path.is_file():
             icn_file = AppIcons.get(AppIcons.FILE, self._icon_color)
             act_open = menu.addAction(icn_file, "파일 열기")
             act_open.triggered.connect(lambda: self._open_document(path, preview=False))
 
-            # 전처리 소스 지정 (이미지 파일만) — 현재 문서 체인에 추가
+            # Images can be added to the current document's chain as Dark/Flat sources
             if path.suffix.lower() in io.IMAGE_SUFFIXES:
                 src = {"file_path": str(path)}
                 a_dark = menu.addAction("→ Dark 소스로 빼기 추가")
@@ -278,24 +275,21 @@ class FileDockMixin:
                 )
             menu.addSeparator()
 
-        # 2. 파일 탐색기에서 열기
         icn_folder = AppIcons.get(AppIcons.FOLDER, self._icon_color)
         act_explorer = menu.addAction(icn_folder, "파일 탐색기에서 열기")
         act_explorer.triggered.connect(lambda: self._show_in_file_manager(path))
 
-        # 3. 경로 복사
         icn_copy = AppIcons.get(AppIcons.COPY, self._icon_color)
         act_copy_path = menu.addAction(icn_copy, "경로 복사")
         act_copy_path.triggered.connect(lambda: self._copy_path_to_clipboard(path))
 
-        # 메뉴 출력
         menu.exec_(self._tree.viewport().mapToGlobal(pos))
 
     def _show_in_file_manager(self, path: Path) -> None:
-        """시스템 파일 탐색기(Windows Explorer 등)에서 해당 파일/폴더를 엽니다."""
+        """Show the file or folder in the system file manager."""
         abs_path = path.resolve()
         if abs_path.is_file():
-            # Windows의 경우 파일 선택 상태로 탐색기 열기 지원
+            # Only Windows Explorer can open with the file selected
             import platform
 
             if platform.system() == "Windows":
@@ -310,7 +304,7 @@ class FileDockMixin:
         QtGui.QDesktopServices.openUrl(target_url)
 
     def _copy_path_to_clipboard(self, path: Path) -> None:
-        """클립보드에 파일/폴더 절대 경로를 복사합니다."""
+        """Copy the absolute path to the clipboard."""
         abs_path = str(path.resolve())
         QtWidgets.QApplication.clipboard().setText(abs_path)
         self._status.showMessage(f"경로 복사됨: {abs_path}", 3000)
