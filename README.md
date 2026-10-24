@@ -1,6 +1,6 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="src/qoradfxm/gui/assets/logo_full_on_dark.png">
-  <img src="src/qoradfxm/gui/assets/logo_full.png" width="96" align="right" alt="">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/media/logo_on_dark.png">
+  <img src="docs/media/logo.png" width="96" align="right" alt="">
 </picture>
 
 # QoraDFXM
